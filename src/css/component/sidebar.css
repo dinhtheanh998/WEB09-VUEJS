@@ -1,0 +1,102 @@
+.sidebar__header {
+  height: 56px;
+}
+.wrap__sidebar__header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0 16px;
+  height: 100%;
+}
+.sidebar__header__menu {
+  background-image: url("../../assets/images/Sprites.64af8f61.svg");
+  background-position: -424px -88px;
+  width: 24px;
+  height: 24px;
+}
+.sidebar__header .sidebar__header__logo {
+  height: 35px;
+}
+
+.wrap__sidebar__toggle {
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+  display: none;
+}
+.wrap__sidebar__toggle.shink {
+  display: flex;
+}
+
+.sidebar__toggle__icon {
+  width: 24px;
+  height: 24px;
+  background-image: url(../../assets/images/Sprites.64af8f61.svg);
+  background-position: -312px -32px;
+  cursor: pointer;
+}
+
+.sidebar__header .sidebar__header__logo img {
+  height: 100%;
+  width: 100%;
+}
+.sidebar.sidebar--shink .sidebar__header {
+  padding-left: 12px;
+  padding-right: 12px;
+  justify-content: center;
+}
+.sidebar.sidebar--shink .wrap__sidebar__header {
+  display: none;
+}
+.sidebar__menu {
+  height: calc(100% - 56px);
+  padding: 20px 12px;
+  overflow-x: visible;
+  overflow-y: auto;
+}
+.link {
+  text-decoration: none;
+}
+.sidebar__menu__item {
+  display: flex;
+  align-items: center;
+  height: 44px;
+  gap: 0 12px;
+  padding: 10px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  color: #fff;
+}
+.sidebar__menu__item:hover {
+  background-color: #5c5c5c;
+}
+
+.router-link-active .sidebar__menu__item {
+  background: #5c5c5c;
+  border-top-left-radius: 0px;
+  border-bottom-left-radius: 0px;
+  border-left: 4px solid var(--primary-color);
+  text-decoration: none;
+}
+
+.sidebar__menu__item__icon {
+  background-image: url("../../assets/images/Sprites.64af8f61.svg");
+  background-position: -30px -1586px;
+  width: 24px;
+  height: 24px;
+  opacity: 0.7;
+}
+.sidebar__menu__item__text {
+  opacity: 0.7;
+  font-size: 14px;
+}
+.sidebar__menu__item:hover .sidebar__menu__item__icon,
+.sidebar__menu__item:hover .sidebar__menu__item__text {
+  opacity: 1;
+}
+.sidebar.sidebar--shink .sidebar__menu__item__text {
+  display: none;
+}

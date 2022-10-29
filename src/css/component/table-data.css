@@ -1,0 +1,119 @@
+.body__table__data {
+    color: var(--text-color);
+    margin: 0 24px 0 12px;
+    width: calc(100% - 36px);
+    height: calc(100% - 64px);
+    position: relative;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  .body__table__data {
+    color: var(--text-color);
+    margin: 0 24px 0 12px;
+    width: calc(100% - 36px);
+    height: calc(100% - 64px);
+    position: relative;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  .wrap-table {
+    width: 100%;
+    flex: 1;
+    overflow: scroll;
+    border-radius: 4px;
+  }
+  .wrap-table::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+  .wrap-table::-webkit-scrollbar-track {
+    margin-top: 48px;
+  }
+  
+  .body__table__data table {
+    width: 100%;
+  }
+  
+  .wrap-table table {
+    border-spacing: 0;
+  }
+  
+  .table__header th,
+  .table__body td {
+    height: 48px;
+    /* line-height: 48px; */
+    vertical-align: middle;
+    white-space: nowrap;
+    text-align: left;
+    padding: 0 16px;
+    border-bottom: 1px solid #cecece;
+    transition: all 0.1s;
+  }
+  
+  .table__header th.text-center,
+  .table__body td.text-center {
+    text-align: center;
+  }
+  
+  .table__header th.text-right,
+  .table__body td.text-right {
+    text-align: right;
+  }
+  
+  .table__header,
+  .table__body {
+    border-bottom: 1px solid #cecece;
+  }
+  
+  .table__header th {
+    background-color: #eeeeee;
+    z-index: 4;
+    font-size: 13px;
+    font-weight: 700;
+    position: sticky;
+    top: 0;
+    text-transform: uppercase;
+  }
+  .table__header th:last-child,
+  .table__body td:last-child {
+    border-right: unset;
+  }
+  .table__body td:nth-child(1),
+  .table__header th:nth-child(1) {
+    text-align: center;
+  }
+  
+  .table__header th:nth-child(1) {
+    position: sticky;
+    left: 0;
+    z-index: 5;
+  }
+  .table__header th:nth-child(2) {
+    position: sticky;
+    left: 50px;
+    z-index: 5;
+  }
+  
+  th.lastcol {
+    position: sticky;
+    right: 0;
+    z-index: 5;
+    /* border-left: 1px solid #cecece; */
+  }
+  
+  .table__header th:first-child:hover .custom__checkbox,
+  .table__body td:first-child:hover .custom__checkbox {
+    background-color: #fff;
+  }
+  
+  .custom__checkbox {
+    width: 18px;
+    height: 18px;
+    border: 1px solid #cecece;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+  }

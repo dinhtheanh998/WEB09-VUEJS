@@ -1,0 +1,80 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&display=swap');
+body {
+    font-family: 'Noto Sans', sans-serif;
+}
+:root {
+    --primary-color: #007aff;
+    --button-color: #007aff;
+    --button-hover-color: #3395ff;
+    --border-input-color: #ebebeb;
+    --error-color: #e61d1d;
+    --placeholder-color: #9e9e9e;
+    --text-color:#424242;
+    --dropdown-hover-color: #CCE4FF;
+    --border-color:#cecece;
+    --hover-color:#E6F2FF
+  }
+
+  .flex-col{
+	display: flex;
+	flex-direction: column;
+}
+.flex{
+	display: flex;
+	flex-direction: row;
+}
+
+.align-center{
+	align-items: center;
+}
+.justify-end{
+	justify-content: flex-end;
+}
+.justify-between{
+	justify-content: space-between;
+}
+.justify-center{
+	justify-content: center;
+}
+.grow-1{
+	flex-grow: 1;
+}
+.w-full{
+	width: 100%;
+}
+.h-full{
+	height: 100%;
+}
+.w-40 {
+    width: 40%;
+}
+.w-25{
+	width: 25%;
+}
+.w-50{
+	width: 50%;
+}
+.gap-x-8{
+	gap: 0 8px;
+}
+.gap-x-12 {
+	gap: 0 12px;
+}
+.gap-x-16 {
+	gap: 0 16px;
+}
+.gap-x-24 {
+	gap: 0 24px;
+}
+.gap-x-32{
+	gap: 0 32px;
+}
+.gap-y-8 {
+	gap: 8px 0;
+}
+.z-10{
+	z-index: 10;
+}
+.cursor-pointer{
+	cursor: pointer;
+}

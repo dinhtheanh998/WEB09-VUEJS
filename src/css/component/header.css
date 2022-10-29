@@ -1,0 +1,64 @@
+.left__content__header,
+.right__content__header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0 16px;
+  height: 56px;
+}
+
+.left__content__header .header__toggle {
+  width: 24px;
+  height: 24px;
+  background-image: url("../../assets/images/Sprites.64af8f61.svg");
+  background-position: -843px -30px;
+  cursor: pointer;
+}
+
+.header__toggle.hidden {
+  display: none;
+}
+
+.left__content__header .dropdown__company {
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 0 8px;
+}
+.right__content__header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0 24px;
+  height: 56px;
+}
+.right__content__header .header__notify {
+  width: 24px;
+  height: 24px;
+  background-image: url("../../assets/images/Sprites.64af8f61.svg");
+  background-position: -787px -30px;
+}
+
+.header_Info {
+  display: flex;
+  align-items: center;
+  gap: 0 8px;
+}
+
+.header_Info .info__avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid #cecece;
+}
+.header_Info .info__avatar img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+}
+.header_Info .info__name {
+  font-size: 14px;
+  font-weight: 600;
+}
