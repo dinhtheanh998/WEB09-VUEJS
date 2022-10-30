@@ -3,15 +3,16 @@
     <h2 class="body__header__title">Nhân Viên</h2>
     <myButton
       btnText="Thêm mới nhân viên"
-      @click="handlePopup"
       isPrimary
+      @click="handleShowPopup"
     ></myButton>
   </div>
   <Teleport to="body">
-    <myPopup v-if="showPopup" :handlePopup="handlePopup" reloadData="reloadData"></myPopup>
+    <myPopup v-show="showPopup" :reloadData="reloadData" :infoEmployee="Employee"></myPopup>
   </Teleport>
 </template>
 <script>
+import { mapState } from 'vuex';
 import myButton from "../Button/myButtonPrimary.vue";
 import myPopup from "../popup/myPopup.vue";
 export default {
@@ -21,14 +22,19 @@ export default {
   },
   data: function () {
     return {
-      showPopup: false,
+      // showPopup: false,
       refeshData: Function,
       recordPerPage: 10,
     };
   },
+  computed: {
+    ...mapState(["Employee", "showPopup"]),
+    
+  },
   methods: {
-    handlePopup() {
-      this.showPopup = !this.showPopup;
+    handleShowPopup() {
+      this.$store.commit("setTitlePopup", "Thêm mới nhân viên");
+      this.$store.commit("setShowPopup");
     },
     reloadData() {
       this.refeshData(this.recordPerPage)    

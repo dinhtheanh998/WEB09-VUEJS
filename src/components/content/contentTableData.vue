@@ -1,5 +1,5 @@
 <template lang="">
-  <div class="body__table__data" >
+  <div class="body__table__data">
     <!-- <button v-if="selectedRow.length>0" @click="deleteMultiRecord">Xóa</button> -->
     <div class="wrap-table">
       <table>
@@ -19,7 +19,7 @@
               <div v-if="isCheckAll" class="wrap__icon-custom">
                 <i class="icofont-check-alt"></i>
               </div>
-            </label>          
+            </label>
           </th>
           <th>Mã nhân viên</th>
           <th>Tên nhân viên</th>
@@ -46,7 +46,9 @@
           </div>
           <tr
             v-else
-            v-for="item in listEmployee?.length > 0 ? listEmployee : listEmployees"
+            v-for="item in listEmployee?.length > 0
+              ? listEmployee
+              : listEmployees"
             class="table__body"
             :key="item.EmployeeCode"
             :class="{ checked: item.isChecked }"
@@ -71,7 +73,7 @@
             <td>{{ item.EmployeeCode }}</td>
             <td>{{ item.EmployeeName }}</td>
             <td>
-              {{ item.GenderName }}
+              {{ item.GenderName || "" }}
             </td>
             <td class="text-center">
               {{
@@ -79,45 +81,42 @@
                 new Date(item.DateOfBirth).toLocaleDateString("vi-VN")
               }}
             </td>
-            <td>125816832</td>
+            <td>{{item.IdentityNumber}}</td>
             <td>Nhân viên</td>
             <td>VP01</td>
             <td>Văn Phòng 01</td>
             <td></td>
             <td></td>
             <td></td>
-            <td>21510002190948</td>
-            <td>BIDV</td>
-            <td></td>
+            <td>{{item.BankAccountNumber}}</td>
+            <td>{{item.BankName}}</td>
+            <td>{{item.BankBranchName}}</td>
             <td>Cổ nhuế - Bắc từ liêm -hà nội</td>
-            <td>0961494001</td>
+            <td>{{item.TelephoneNumber}}</td>
             <td class="text-right">5.000.000</td>
             <td
               class="lastcol text-center"
               :style="{ zIndex: showContextMenu ? 3 : 0 }"
             >
               <div class="wrap__context">
-                <button class="context__btn-edit">Sửa</button>
+                <button
+                  class="context__btn-edit"
+                  @click="
+                    async () => {
+                      await getEmployeeById(item.EmployeeId);
+                      showPopup();
+                    }
+                  "
+                >
+                  Sửa
+                </button>
                 <div
                   class="context__icon"
-                  @click="handleClickContextIcon($event, item)"                  
-                ></div>                
+                  @click="handleClickContextIcon($event, item)"
+                ></div>
               </div>
             </td>
           </tr>
-          <!-- <RowDataTable
-            v-for="item of listEmployees"
-            :key="item.EmployeeId"
-            :fullName="item.EmployeeName"
-            :code="item.EmployeeCode"
-            :gender="item.Gender"
-            :DateOfBirth="item.DateOfBirth"
-            :id="item.EmployeeId"
-            :isChecked="item.isChecked"
-            v-model="isCheckAll"
-            @selectRow="selectRow"
-            @deleteRow="deleteRow"
-          ></RowDataTable> -->
         </tbody>
       </table>
     </div>
@@ -128,30 +127,41 @@
   </div>
   <warningDialogVue
     v-if="showDialogDel.isShow"
-    :description="'Bạn có chắc chắn muốn xóa ' + infoAndCoord.item.EmployeeName+ ' không?'"
+    :description="
+      'Bạn có chắc chắn muốn xóa ' + infoAndCoord.item.EmployeeName + ' không?'
+    "
     :handleDeleteTrue="handleDeleteTrue"
     :handleDeleteFalse="handleDeleteFalse"
     type="warning"
   ></warningDialogVue>
-  <teleport to='body'>
-    <ContextMenu v-if="showContextMenu" :coord="infoAndCoord.coord" :item="infoAndCoord.item" @clickDelete="handleEmitDelete" id="context__menu"></ContextMenu>
+  <teleport to="body">
+    <ContextMenu
+      v-if="showContextMenu"
+      :coord="infoAndCoord.coord"
+      :item="infoAndCoord.item"
+      @clickDelete="handleEmitDelete"
+      id="context__menu"
+    ></ContextMenu>
   </teleport>
 </template>
 <script>
 import contentPagging from "./contentPagging.vue";
-import {DEFAULT_PAGE_SIZE, DEFAULT_PAGE_NUMBER} from "../../config/Constraint"
+import {
+  DEFAULT_PAGE_SIZE,
+  DEFAULT_PAGE_NUMBER,
+} from "../../config/Constraint";
 // eslint-disable-next-line no-unused-vars
 import RowDataTable from "./tableRowData.vue";
 import warningDialogVue from "../dialog/warningDialog.vue";
-import ContextMenu from "../dialog/ContextMenu.vue"
+import ContextMenu from "../dialog/ContextMenu.vue";
 import axios from "axios";
-import  {mapActions, mapState } from "vuex";
+import { mapActions, mapState } from "vuex";
 
 // import myCheckbox from "../checkbox/myCheckbox.vue";
 export default {
   data: function () {
     return {
-      recordPerPage:0,
+      recordPerPage: 0,
       //Danh sách nhân viên
       listEmployees: [],
       // Tổng số bản ghi
@@ -172,7 +182,7 @@ export default {
       //Thông tin và tọa độ của context menu
       infoAndCoord: {
         item: null,
-        coord:{}
+        coord: {},
       },
       refeshData: Function,
     };
@@ -186,9 +196,9 @@ export default {
   props: {
     forceRender: {
       type: Function,
-    }
+    },
   },
-  methods: {    
+  methods: {
     clickCheckAll() {
       if (this.isCheckAll) {
         this.listEmployees.forEach((item) => {
@@ -198,7 +208,7 @@ export default {
     },
     /**
      * Đưa các id của nhân viên được chọn vào mảng selectedRow
-     * @param {string id employee} id 
+     * @param {string id employee} id
      * Author: DTANH (25/10/2022)
      */
     rowChecked(id) {
@@ -208,7 +218,7 @@ export default {
         this.selectedRow.push(id);
       }
       this.isCheckAll = this.selectedRow.length == this.listEmployees.length;
-      this.eventBus.emit("rowSelectDelete", this.selectedRow)
+      this.eventBus.emit("rowSelectDelete", this.selectedRow);
     },
     /** set data
      * @param {array} data
@@ -234,7 +244,7 @@ export default {
       this.deleteOneRecord(this.showDialogDel.id); // console.log("Xóa bản ghi có id là:", );
       this.showDialogDel.isShow = false;
       this.showDialogDel.id = null;
-      console.log(this.listEmployees)
+      console.log(this.listEmployees);
     },
     /**
      * Hủy xóa nhân viên
@@ -248,14 +258,14 @@ export default {
       this.showContextMenu = !this.showContextMenu;
       this.infoAndCoord = {
         item,
-        coord: e.target.getBoundingClientRect()
-      }
+        coord: e.target.getBoundingClientRect(),
+      };
     },
     /**
      * Xóa nhân viên
      * @param {string} id
      * Author: DTANH (25/10/2022)
-    */
+     */
     deleteOneRecord(id) {
       axios
         .delete(`https://amis.manhnv.net/api/v1/Employees/${id}`)
@@ -277,17 +287,24 @@ export default {
       });
     },
     /** close context Menu */
-    closeContextMenu(e){
+    closeContextMenu(e) {
       if (e.target.closest(".context__icon")) return;
       this.showContextMenu = false;
     },
-    ...mapActions(["filterEmployee"])
-  },  
+    /**
+     * Hiển thị popup
+     */
+    showPopup() {
+      this.$store.commit("setTitlePopup", "Sửa nhân viên");
+      this.$store.commit("setShowPopup");
+    },
+    ...mapActions(["filterEmployee", "getEmployeeById"]),
+  },
 
   computed: {
-    ...mapState(["listEmployee"]),
+    ...mapState(["listEmployee", "Employee"]),
   },
-  
+
   watch: {
     isCheckAll: function () {
       if (this.isCheckAll)
@@ -303,12 +320,15 @@ export default {
       this.recordPerPage = data;
     });
     document.addEventListener("click", this.closeContextMenu);
-    this.$store.dispatch("filterEmployee", {pageSize: DEFAULT_PAGE_SIZE, pageNumber: DEFAULT_PAGE_NUMBER});
+    this.$store.dispatch("filterEmployee", {
+      pageSize: DEFAULT_PAGE_SIZE,
+      pageNumber: DEFAULT_PAGE_NUMBER,
+    });
   },
   unmounted() {
-    this.eventBus.off("reloadData")
+    this.eventBus.off("reloadData");
     document.removeEventListener("click", this.closeContextMenu);
-  }
+  },
 };
 </script>
 

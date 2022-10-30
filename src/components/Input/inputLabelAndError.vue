@@ -7,6 +7,7 @@
       :placeholder="placeholderText"
       :name="name"
       :id="name"
+      :value="valueInput || ''"
       @change="onChange"
     />
     <span class="input__text-error" :class="{show:error}" :title="error">{{error}}</span>
@@ -53,16 +54,20 @@ export default {
       type: Boolean,
       default: false,
     },
+    valueInput: {
+      type: [String, Date],
+      default: "",
+    },
   },
   methods: {
     onChange: function (event) {
+      this.$store.commit("setModifiedForm",false)
       this.$emit("returnValue", {
         target: this.$props.name,
         value: event.target.value,
       });
     },
   },
-
 };
 </script>
 <style lang="css" scoped>

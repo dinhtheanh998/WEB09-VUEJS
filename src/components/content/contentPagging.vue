@@ -13,7 +13,6 @@
           id="dropdown__range--pagging"
           :arrays="paggingRange"
           moveToTop
-          @returnPaggingRange="returnValue"
           :defaultValue="pageSize"
         ></myDropdown>
       </div>
@@ -55,10 +54,7 @@ export default {
       type: Function,
       default: () => {},
     },
-    totalPage: {
-      type: Number,
-      default: 1,
-    },
+    
   },
   components: {
     myDropdown,
@@ -111,6 +107,7 @@ export default {
      * Author: DTANh(25/10/2022)
      */
     nextPage: function () {
+      if(this.pageNumber === this.totalPage ) return;
       console.log(this.pageNumber, this.totalPage)
       this.$store.dispatch("incrementPageNumber");
       this.$store.dispatch("filterEmployee", { pageSize: this.$store.state.pageSize, pageNumber: this.$store.state.pageNumber });
@@ -118,13 +115,13 @@ export default {
   },
   computed: {
     startPage: function () {
-      return (this.paggingIndex - 1) * this.recordPerPage + 1;
+      return (this.pageNumber - 1) * this.pageSize + 1;
     },
     endPage: function () {
-      if (this.paggingIndex * this.recordPerPage > this.totalRecord) {
+      if (this.pageNumber * this.pageSize > this.totalRecord) {
         return this.totalRecord;
       } else {
-        return this.paggingIndex * this.recordPerPage;
+        return this.pageNumber * this.pageSize;
       }
     },
     ...mapState(["pageSize", "pageNumber","listEmployee","totalRecord","totalPage"]),

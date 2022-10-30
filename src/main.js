@@ -2,7 +2,7 @@ import { createApp } from 'vue'
 import App from './App.vue'
 import mitt from "mitt";
 import router from "./router/router.js";
-import  store from "./store/index.js"
+import store from "./store/index.js"
 import "./assets/font/icofont/icofont.min.css"
 import "./css/reset-css.css";
 import "./css/main.css";

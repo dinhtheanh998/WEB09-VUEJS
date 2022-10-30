@@ -1,5 +1,5 @@
 <template lang="">
-    <button class="btn" :class="{ 'btn--primary': isPrimary , 'btn--secondary': isSecondary }">{{ btnText }}</button>
+    <button :type="typeBtn" class="btn" :class="{ 'btn--primary': isPrimary , 'btn--secondary': isSecondary }">{{ btnText }}</button>
 </template>
 <script>
 export default {
@@ -16,6 +16,10 @@ export default {
       type: Boolean,
       default: false,
     },
+    typeBtn: {
+      type: String,
+      default: "button",
+    }
   },
 };
 </script>

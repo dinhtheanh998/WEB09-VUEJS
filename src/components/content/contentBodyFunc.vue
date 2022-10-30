@@ -13,7 +13,7 @@
           type="text"
           class="input__search"
           placeholder="Tìm theo mã, tên nhân viên"
-          @input="handleSearchEmployee"
+          @input="searchDebounce"
         />
         <div class="search__icon"></div>
       </div>
@@ -34,6 +34,7 @@
 </template>
 <script>
 import warningDialogVue from "../dialog/warningDialog.vue";
+import _ from "lodash";
 // import inputIcon from "../Input/inputWithIcon.vue";
 import axios from "axios";
 import { mapActions } from "vuex";
@@ -76,13 +77,35 @@ export default {
       this.showDialogDel.isShow = false;
     },
     handleSearchEmployee(e) {
-      if (e.target.value.length > 0) { 
-        this.$store.dispatch("searchEmployee", e.target.value);
+      if (e.target.value.length > 0) {
+        this.$store.dispatch("searchEmployee", {
+          pageSize: this.$store.state.pageSize,
+          pageNumber: this.$store.state.pageNumber,
+          param: e.target.value,
+        });
       } else {
-        this.$store.dispatch("filterEmployee",{ pageSize :this.$store.state.pageSize, pageNumber: this.$store.state.pageNumber });
+        this.$store.dispatch("filterEmployee", {
+          pageSize: this.$store.state.pageSize,
+          pageNumber: this.$store.state.pageNumber,
+        });
       }
     },
-    ...mapActions(["searchEmployee","filterEmployee"]),
+    debounce(fn, delay) {
+      let timer = null;
+      return function () {
+        let context = this;
+        let args = arguments;
+        clearTimeout(timer);
+        timer = setTimeout(function () {
+          fn.apply(context, args);
+        }, delay);
+      };
+    },
+    searchDebounce: _.debounce(function (e) {
+      this.handleSearchEmployee(e);
+    }, 500),
+
+    ...mapActions(["searchEmployee", "filterEmployee"]),
   },
   created() {
     this.eventBus.on("rowSelectDelete", (data) => {

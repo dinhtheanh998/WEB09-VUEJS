@@ -13,6 +13,9 @@ export default {
   },
   computed: {    
     // ...mapGetters(["getDepartmentByName"]),
+    // randomNumber(name){
+    //   return getRamdomNumber(name)
+    // },
     ...mapState(["listEmployee", "listDepartment"]),
   },
   methods: {
