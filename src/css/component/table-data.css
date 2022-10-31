@@ -50,6 +50,8 @@
     padding: 0 16px;
     border-bottom: 1px solid #cecece;
     transition: all 0.1s;
+    user-select: none;
+    cursor: pointer;
   }
   
   .table__header th.text-center,

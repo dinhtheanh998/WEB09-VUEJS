@@ -6,7 +6,7 @@
         <strong class="number__documents">{{ totalRecord }}</strong></span
       >
     </div>
-    <div class="pagging">
+    <div class="pagging--range-numberPage">
       <div class="pagging__range">
         <span>Tổng bản ghi/trang:</span>
         <myDropdown
@@ -17,25 +17,27 @@
         ></myDropdown>
       </div>
       <div class="flex align-center gap-x-16">
-        <div>
+        <!-- <div>
           <span class="pagging__range__number"
             >{{ startPage }} -
             {{ endPage }}
           </span>
           <span>bản ghi</span>
-        </div>
-        <span class="pagging__option" @click="prevPage">
+        </div> -->
+        <!-- <span class="pagging__option" @click="prevPage">
           <i class="icofont-rounded-left"></i
         ></span>
         <span class="pagging__option" @click="nextPage"
           ><i class="icofont-rounded-right"></i
-        ></span>
+        ></span> -->
+        <Pagging></Pagging>
       </div>
     </div>
   </div>
 </template>
 <script>
 import myDropdown from "../dropdown/myDropdown.vue";
+import  Pagging from "../pagging/Pagging.vue"
 // import axios from "axios";
 import { mapActions, mapState } from 'vuex';
 export default {
@@ -50,14 +52,10 @@ export default {
     };
   },
   props: {
-    setEmployees: {
-      type: Function,
-      default: () => {},
-    },
-    
   },
   components: {
     myDropdown,
+    Pagging,
   },
   methods: {
     ...mapActions(["incrementPageNumber","decrementPageNumber","filterEmployee"]),
@@ -96,22 +94,22 @@ export default {
      * @param {number} value
      * Author: DTANh(25/10/2022)
      */
-    prevPage: function () {
-      if(this.pageNumber === 1 ) return;
-      this.$store.dispatch("decrementPageNumber")
-      this.$store.dispatch("filterEmployee", { pageSize: this.$store.state.pageSize, pageNumber: this.$store.state.pageNumber });
-    },
-    /**
-     * Chuyển trang sau
-     * @param {number} value
-     * Author: DTANh(25/10/2022)
-     */
-    nextPage: function () {
-      if(this.pageNumber === this.totalPage ) return;
-      console.log(this.pageNumber, this.totalPage)
-      this.$store.dispatch("incrementPageNumber");
-      this.$store.dispatch("filterEmployee", { pageSize: this.$store.state.pageSize, pageNumber: this.$store.state.pageNumber });
-    },
+    // prevPage: function () {
+    //   if(this.pageNumber === 1 ) return;
+    //   this.$store.dispatch("decrementPageNumber")
+    //   this.$store.dispatch("filterEmployee", { pageSize: this.$store.state.pageSize, pageNumber: this.$store.state.pageNumber });
+    // },
+    // /**
+    //  * Chuyển trang sau
+    //  * @param {number} value
+    //  * Author: DTANh(25/10/2022)
+    //  */
+    // nextPage: function () {
+    //   if(this.pageNumber === this.totalPage ) return;
+    //   console.log(this.pageNumber, this.totalPage)
+    //   this.$store.dispatch("incrementPageNumber");
+    //   this.$store.dispatch("filterEmployee", { pageSize: this.$store.state.pageSize, pageNumber: this.$store.state.pageNumber });
+    // },
   },
   computed: {
     startPage: function () {
@@ -189,7 +187,7 @@ export default {
 .total__documents .number__documents {
   font-weight: 600;
 }
-.pagging {
+.pagging--range-numberPage {
   display: flex;
   align-items: center;
   gap: 0 16px;

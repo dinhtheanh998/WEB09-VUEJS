@@ -19,7 +19,7 @@
       </div>
       <!-- <inputIcon placeholder="Tìm theo mã tên nhân viên"></inputIcon> -->
     </div>
-    <div class="reload__icon" title="Làm mới dữ liệu"></div>
+    <div class="reload__icon" title="Làm mới dữ liệu" @click="reloadData"></div>
   </div>
   <teleport to="body">
     <warningDialogVue
@@ -53,6 +53,7 @@ export default {
     warningDialogVue,
   },
   methods: {
+    ...mapActions(["reloadData"]),
     onClickDeleteMulti() {
       this.showDialogDel.isShow = true;
       this.showDialogDel.data = this.rowSelected;
@@ -78,10 +79,10 @@ export default {
     },
     handleSearchEmployee(e) {
       if (e.target.value.length > 0) {
-        this.$store.dispatch("searchEmployee", {
+        console.log(e.target.value);
+        this.$store.dispatch("filterEmployee", {
           pageSize: this.$store.state.pageSize,
           pageNumber: this.$store.state.pageNumber,
-          param: e.target.value,
         });
       } else {
         this.$store.dispatch("filterEmployee", {
@@ -102,6 +103,8 @@ export default {
       };
     },
     searchDebounce: _.debounce(function (e) {
+      console.log(e.target.value);
+      this.$store.commit("setSearchKeyword", e.target.value);      
       this.handleSearchEmployee(e);
     }, 500),
 

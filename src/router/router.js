@@ -1,5 +1,4 @@
 import { createRouter, createWebHistory } from "vue-router";
-
 import layoutContent from "../layout/layoutContent.vue";
 import  OtherCom from "../components/Page/OtherComponent.vue"
 

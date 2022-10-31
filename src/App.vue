@@ -10,12 +10,16 @@
   <!-- <mydialog description="Bạn có muốn xóa nhân viên này không"></mydialog> -->
   <!-- <myCheckbox></myCheckbox> -->
   <TestComponentVue></TestComponentVue>
+  <div style="margin:32px 0"></div>
+  <PaggingVue :totalPage="6" :numberPageDisplay="2"></PaggingVue>
 </template>
 
 <script>
 import layoutSibar from "./layout/layoutSibar.vue";
 import layoutHeader from "./layout/layoutHeader.vue";
 import TestComponentVue from "./components/TestComponent.vue";
+import PaggingVue from "./components/pagging/Pagging.vue";
+import { mapState } from 'vuex';
 // import layoutContent from "./layout/layoutContent.vue";
 // import myCheckbox from "./components/checkbox/myCheckbox.vue"
 // import  myDropdown from "./components/dropdown/myDropdown.vue"
@@ -32,6 +36,7 @@ export default {
     layoutSibar,
     layoutHeader,
     TestComponentVue,
+    PaggingVue,
     // layoutContent,
     // myCheckbox
     // myDropdown,
@@ -46,6 +51,9 @@ export default {
       })
     }
   },
+  computed: {
+        ...mapState(["pageNumber","totalPage"])
+    },
 }
 </script>
 <style lang="css" scoped>

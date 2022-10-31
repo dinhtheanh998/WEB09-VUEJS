@@ -33,6 +33,7 @@ export default {
   },
   methods: {
     handleShowPopup() {
+      this.$store.commit("clearEmployee");
       this.$store.commit("setTitlePopup", "Thêm mới nhân viên");
       this.$store.commit("setShowPopup");
     },

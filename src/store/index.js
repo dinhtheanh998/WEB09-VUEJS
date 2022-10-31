@@ -13,11 +13,13 @@ export default createStore({
     pageNumber: DEFAULT_PAGE_NUMBER,
     totalPage: 0,
     totalRecord: 0,
+    searchKeyword: null,
     Employee: {},
     showPopup: false,
     modifiedForm: true,
     titlePopup: "",
     editForm: false,
+    resError:{}
   },
   mutations: {
     setDepartment(state, payload) {
@@ -40,27 +42,32 @@ export default createStore({
     },
     setEmployee(state, payload) {
       state.Employee = payload;
-
     },
     setShowPopup(state) {
       state.showPopup = !state.showPopup;
     },
-    setTitlePopup(state, payload) { 
+    setTitlePopup(state, payload) {
       state.titlePopup = payload;
     },
-    setModifiedForm(state,payload){ 
+    setModifiedForm(state, payload) {
       state.modifiedForm = payload;
     },
-    updateMessage (state, message) {
-      state.formEmp.message = message
+    updateMessage(state, message) {
+      state.formEmp.message = message;
     },
-    clearEmployee(state) { 
+    clearEmployee(state) {
       state.Employee = {};
     },
-    addEmployee(state, payload) { 
+    addEmployee(state, payload) {
       state.listEmployee.unshift(payload);
       state.showPopup = false;
       state.Employee = {};
+    },
+    setSearchKeyword(state, payload) {
+      state.searchKeyword = payload;
+    },
+    setError(state, payload) { 
+      state.resError = payload;
     }
   },
   actions: {
@@ -92,10 +99,14 @@ export default createStore({
      * Phân trang nhân viên
      * Author: DTANH(29/10/2022)
      * */
-    filterEmployee({ commit }, { pageSize, pageNumber }) {
+    filterEmployee({ commit, getters }, { pageSize, pageNumber }) {
       axios
         .get(
-          `${API.GET_ALL_EMPLOYEE}/filter?pageSize=${pageSize}&pageNumber=${pageNumber}`
+          `${
+            API.GET_ALL_EMPLOYEE
+          }/filter?pageSize=${pageSize}&pageNumber=${pageNumber}${
+            getters["keyWord"] ? `&employeeFilter=${getters["keyWord"]}` : ""
+          }`
         )
         .then((res) => {
           commit("setListEmployee", res.data.Data);
@@ -133,27 +144,61 @@ export default createStore({
     /**
      * Sửa nhân viên theo id
      */
-    editEmployee({ commit }, { id, data }) {
-      axios.put(`${API.GET_ALL_EMPLOYEE}/${id}`, data).then((res) => {
-        if (res.status == 200) {
-          commit("clearEmployee");
-          commit("setShowPopup");
-        }
-      }).catch((error) => { 
-        console.log(error)
-      });
+    editEmployee({ commit, dispatch }, { id, data }) {
+      axios
+        .put(`${API.GET_ALL_EMPLOYEE}/${id}`, data)
+        .then((res) => {
+          if (res.status == 200) {
+            dispatch("reloadData");
+            commit("clearEmployee");
+            commit("setShowPopup");
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     },
     /**
      * Thêm mới nhân viên
      */
-    addEmployee({ commit }, data) { 
-      axios.post(`${API.GET_ALL_EMPLOYEE}`, data).then((res) => {
-        if (res.status === 201) { 
-          commit("addEmployee", data);
-        }
-      }).catch((error) => { 
-        console.log(error);
-      })
+    addEmployee({ commit }, data) {
+      axios
+        .post(`${API.GET_ALL_EMPLOYEE}`, data)
+        .then((res) => {
+          if (res.status === 201) {
+            commit("addEmployee", data);
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+          commit("setError", {
+            errorCode: error.response.status,
+            errorMsg: error.response.data.userMsg
+          });
+        });
+    },
+    /**
+     * Reload data
+    */
+    reloadData({ getters,dispatch  }) { 
+      // commit("setPageNumber", DEFAULT_PAGE_NUMBER);
+      // commit("setPageSize", DEFAULT_PAGE_SIZE);
+      // commit("setSearchKeyword", null);
+      dispatch("filterEmployee", {
+        pageSize: getters["pageSize"],
+        pageNumber: getters["pageNumber"],
+      });
+    }
+  },
+  getters: {
+    keyWord: (state) => {
+      return state.searchKeyword;
+    },
+    pageSize: (state) => { 
+      return state.pageSize
+    },
+    pageNumber: (state) => { 
+      return state.pageNumber
     }
   },
 });

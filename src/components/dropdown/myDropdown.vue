@@ -74,12 +74,20 @@ export default {
       this.$emit("returnDepartments", value);
       this.$emit("returnPaggingRange", value);
     },
-
+    close(e) {
+      if(!e.target.closest(`#${this.id}`)){
+        this.isOpen = false;
+      }
+    }
   },
   created() {
     this.$emit("returnPaggingRange", 10);
   },
-  beforeUnmount() {
+  mounted(){
+    document.addEventListener('click', this.close)
+  },
+  unmounted() {
+    document.removeEventListener('click', this.close)
   },
 };
 </script>

@@ -52,6 +52,12 @@
             class="table__body"
             :key="item.EmployeeCode"
             :class="{ checked: item.isChecked }"
+            @dblclick="
+              async () => {
+                await getEmployeeById(item.EmployeeId);
+                showPopup();
+              }
+            "
           >
             <td class="headcol">
               <label
@@ -81,18 +87,18 @@
                 new Date(item.DateOfBirth).toLocaleDateString("vi-VN")
               }}
             </td>
-            <td>{{item.IdentityNumber}}</td>
+            <td>{{ item.IdentityNumber }}</td>
             <td>Nhân viên</td>
             <td>VP01</td>
             <td>Văn Phòng 01</td>
             <td></td>
             <td></td>
             <td></td>
-            <td>{{item.BankAccountNumber}}</td>
-            <td>{{item.BankName}}</td>
-            <td>{{item.BankBranchName}}</td>
+            <td>{{ item.BankAccountNumber }}</td>
+            <td>{{ item.BankName }}</td>
+            <td>{{ item.BankBranchName }}</td>
             <td>Cổ nhuế - Bắc từ liêm -hà nội</td>
-            <td>{{item.TelephoneNumber}}</td>
+            <td>{{ item.TelephoneNumber }}</td>
             <td class="text-right">5.000.000</td>
             <td
               class="lastcol text-center"
@@ -122,13 +128,12 @@
     </div>
     <contentPagging
       :totalRecord="totalRecord"
-      :setEmployees="setEmployees"
     ></contentPagging>
   </div>
   <warningDialogVue
     v-if="showDialogDel.isShow"
     :description="
-      'Bạn có chắc chắn muốn xóa ' + infoAndCoord.item.EmployeeName + ' không?'
+      'Bạn có chắc chắn muốn xóa \'' + infoAndCoord.item.EmployeeName + '\' không?'
     "
     :handleDeleteTrue="handleDeleteTrue"
     :handleDeleteFalse="handleDeleteFalse"

@@ -36,7 +36,7 @@ export default {
   width: 100%;
   height: 100%;
   padding-right: 33px;
-  padding-left: 10px;
+  padding-left: 12px;
   border-radius: 4px;
 }
 .input__search::placeholder {

@@ -35,6 +35,9 @@ export default {
     forceRender(){
       this.componentKey++
     },
+  },
+  created() {
+    document.title = "Amis - Quản lý nhân sự";
   }
 };
 </script>

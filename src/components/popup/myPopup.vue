@@ -71,7 +71,6 @@
               tabIndex="1"
               classProps="flex-col w-full wrap__textfield"
               @returnValue="returnValue"
-              :error="error.EmployeeCode"
             ></inputLabelAndError>
           </div>
           <div class="right__details">
@@ -273,12 +272,23 @@
       </div>
     </form>
   </div>
+  <teleport to="body">
+    <warningDialogVue
+      v-if="dialogData.dialogShow"
+      :description="dialogData.description"
+      :type="dialogData.type"
+      zIndex="true"
+      :btnTextPrimary="dialogData.btnText"
+      :handleDeleteTrue="()=> {dialogData.dialogShow = false}"
+    />
+  </teleport>
 </template>
 <script>
 // import axios from "axios";
 import myButton from "../Button/myButtonPrimary.vue";
 import inputLabelAndError from "../Input/inputLabelAndError.vue";
 import myDropdown from "../dropdown/myDropdown.vue";
+import warningDialogVue from "../dialog/warningDialog.vue";
 import _ from "lodash";
 import { mapActions, mapMutations, mapState } from "vuex";
 export default {
@@ -286,6 +296,7 @@ export default {
     myButton,
     inputLabelAndError,
     myDropdown,
+    warningDialogVue,
   },
   data: function () {
     return {
@@ -296,6 +307,13 @@ export default {
         DepartmentId: "",
         DepartmentName: "",
         Email: "",
+      },
+      dialogData: {
+        dialogShow: false,
+        type: "warning",
+        description: "Bạn chưa thay đổi thông tin nào",
+        btnText: "Xác nhận",
+        btnCancelText: "Hủy",
       },
     };
   },
@@ -317,7 +335,7 @@ export default {
         DepartmentId: "",
         DepartmentName: "",
         Email: "",
-      }
+      };
       e.preventDefault();
       // validate form
       if (!this.$store.state.Employee?.EmployeeName) {
@@ -330,27 +348,31 @@ export default {
       } else if (this.$store.state.Employee?.EmployeeCode.length < 6) {
         this.error.EmployeeCode = "Mã nhân viên phải có ít nhất 6 ký tự";
         isValid = false;
-
       } else if (this.$store.state.Employee?.EmployeeCode.length > 20) {
         this.error.EmployeeCode = "Mã nhân viên không được quá 20 ký tự";
         isValid = false;
-
-      } else if (!this.validateEmployeeCode(this.$store.state.Employee?.EmployeeCode)) {
+      } else if (
+        !this.validateEmployeeCode(this.$store.state.Employee?.EmployeeCode)
+      ) {
         this.error.EmployeeCode =
           "Mã nhân viên bắt đầu bằng chữ và kết thúc là số";
         isValid = false;
-
       }
-      if (this.$store.state.Employee?.Email && !this.validateEmail(this.$store.state.Employee?.Email)) {
+      if (
+        this.$store.state.Employee?.Email &&
+        !this.validateEmail(this.$store.state.Employee?.Email)
+      ) {
         this.error.Email = "Vui lòng nhập đúng định dạng của email";
         isValid = false;
       }
       if (isValid) {
-        this.$store.dispatch("addEmployee", this.$store.state.Employee);
+        this.handleAddData();
+        // this.$store.dispatch("addEmployee", this.$store.state.Employee);
+        console.log(_.isEmpty(this.resError))        
       }
+      
       // call api
       this.validateEmail(this.$store.state.Employee?.Email);
-      console.log(this.$store.state.Employee);
       // axios.post("https://amis.manhnv.net/api/v1/Employees", this.$store.sate.Employee).then((res) => {
       //   if(res.status === 201) {
       //     this.$props.handlePopup();
@@ -373,20 +395,20 @@ export default {
     },
     returnValue({ target, value }) {
       console.log({ target, value });
-      console.log(target == 'department')
+      console.log(target == "department");
       if (!this.$store.state.editForm) {
-        if (target == 'department') {
+        if (target == "department") {
           this.$store.state.Employee.DepartmentId = value.deparmentID;
           this.$store.state.Employee.DepartmentName = value.departmentName;
-        } else {          
+        } else {
           this.$store.state.Employee[target] = value;
-        }        
+        }
       }
     },
     choseGender(e) {
       this.$store.state.Employee.Gender = e.target.value;
       this.$store.state.Employee.GenderName = e.target.dataset.label;
-      this.$store.commit("setModifiedForm",false)
+      this.$store.commit("setModifiedForm", false);
     },
     checkObjectIsEmpty(obj) {
       return _.isEmpty(obj);
@@ -396,17 +418,26 @@ export default {
     },
     handleSaveData() {
       if (this.modifiedForm) {
-        console.log("Chưa chỉnh sửa gì trong form");
+        this.dialogData.dialogShow = true;
       } else {
         this.$store.dispatch("editEmployee", {
           id: this.$store.state.Employee.EmployeeId,
           data: this.$store.state.Employee,
         });
+        this.$store.commit("setModifiedForm", true);
       }
     },
-    ...mapActions(["getAllDepartment", "editEmployee","addEmployee"]),
+
+    async handleAddData() {
+      await this.$store.dispatch("addEmployee", this.$store.state.Employee);
+      if (!_.isEmpty(this.resError)) {
+          this.dialogData.dialogShow = true;
+          this.dialogData.description = this.resError.errorMsg;
+      }
+    },
+    ...mapActions(["getAllDepartment", "editEmployee", "addEmployee"]),
   },
-  created() {},
+
   computed: {
     ...mapState([
       "listDepartment",
@@ -415,13 +446,21 @@ export default {
       "titlePopup",
       "modifiedForm",
       "formEmp",
+      "resError"
     ]),
     ...mapMutations(["setShowPopup"]),
   },
   mounted() {
+    console.log("POPup",this.$refs.empCode)
     this.$refs.empCode.$el.querySelector("input[type=text]").focus();
     this.getAllDepartment();
   },
+  watch: {
+    resError : function() {
+      this.dialogData.dialogShow = true;
+      this.dialogData.description = this.resError.errorMsg;
+    }
+  }
 };
 </script>
 <style lang="css" scoped>

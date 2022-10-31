@@ -1,5 +1,5 @@
 <template lang="">
-  <div class="dialog">
+  <div class="dialog" :style="[zIndex ? 'z-index: 999' :'' ]">
     <div class="dialog__overlay"></div>
     <div class="dialog__container flex-col">
       <div class="dialog__body flex align-center gap-x-16 grow-1">
@@ -8,9 +8,9 @@
           {{ description }}
         </div>
       </div>
-      <div class="dialog__footer flex justify-between gap-x-8">
-        <myButton btnText="Không" isSecondary @click="handleDeleteFalse"></myButton>
-        <myButton btnText="Có" isPrimary @click="handleDeleteTrue(event,id)"></myButton>
+      <div class="dialog__footer flex gap-x-8" :class="[btnTextSecondary ? 'justify-between' : 'justify-end']">
+        <myButton v-show="btnTextSecondary" :btnText="btnTextSecondary" isSecondary @click="handleDeleteFalse"></myButton>
+        <myButton :btnText="btnTextPrimary" isPrimary @click="handleDeleteTrue(event,id)"></myButton>
       </div>
     </div>
   </div>
@@ -31,6 +31,18 @@ export default {
     },
     type: {
       type: String
+    },
+    btnTextPrimary: {
+      type: String,
+      default: "Có"
+    },
+    btnTextSecondary: {
+      type: String,
+      default: null
+    },
+    zIndex: {
+      type: Boolean,
+      default: false
     }
   },
   components: {
