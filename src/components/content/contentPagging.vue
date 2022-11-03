@@ -171,6 +171,7 @@ export default {
   margin-right: 4px;
 }
 .wrap__pagging {
+  border-top: 1px solid var(--border-color);
   display: flex;
   align-items: center;
   justify-content: space-between;

@@ -6,13 +6,15 @@
       isPrimary
       @click="handleShowPopup"
     ></myButton>
+    <Teleport to="body">
+      <myPopup v-if="showPopup"></myPopup>
+      <!-- <myPopup v-show="showPopup" :infoEmployee="Employee"></myPopup> -->
+    </Teleport>
   </div>
-  <Teleport to="body">
-    <myPopup v-show="showPopup" :reloadData="reloadData" :infoEmployee="Employee"></myPopup>
-  </Teleport>
 </template>
 <script>
-import { mapState } from 'vuex';
+import { CLEAR_EMPLOYEE, SET_TITLE_POPUP, STATUS_POPUP } from "@/store/Mutatios.Type";
+import { mapState } from "vuex";
 import myButton from "../Button/myButtonPrimary.vue";
 import myPopup from "../popup/myPopup.vue";
 export default {
@@ -29,17 +31,16 @@ export default {
   },
   computed: {
     ...mapState(["Employee", "showPopup"]),
-    
   },
   methods: {
     handleShowPopup() {
-      this.$store.commit("clearEmployee");
-      this.$store.commit("setTitlePopup", "Thêm mới nhân viên");
-      this.$store.commit("setShowPopup");
+      this.$store.commit(CLEAR_EMPLOYEE);
+      this.$store.commit(SET_TITLE_POPUP, "Thêm mới nhân viên");
+      this.$store.commit(STATUS_POPUP);
     },
     reloadData() {
-      this.refeshData(this.recordPerPage)    
-    }
+      this.refeshData(this.recordPerPage);
+    },
   },
   created() {
     this.eventBus.on("reloadData", (data) => {
@@ -48,6 +49,20 @@ export default {
     });
     this.eventBus.on("recordPerPage", (data) => {
       this.recordPerPage = data;
+    });
+  },
+  mounted() {
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Insert") {
+        this.handleShowPopup();
+      }
+    });
+  },
+  unmounted() {
+    document.removeEventListener("keydown", (e) => {
+      if (e.key === "Insert") {
+        this.handleShowPopup();
+      }
     });
   },
 };

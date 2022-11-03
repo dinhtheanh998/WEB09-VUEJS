@@ -4,7 +4,7 @@
       <contentBodyTop></contentBodyTop>
       <div class="content__bottom">
         <contentBodyFunc></contentBodyFunc>
-        <contentTableData :key="componentKey" :forceRender="forceRender"></contentTableData>
+        <contentTableData :key="componentKey" :forceRender="forceRender" id="tableData"></contentTableData>
       </div>
     </div>
   </div>
@@ -38,7 +38,8 @@ export default {
   },
   created() {
     document.title = "Amis - Quản lý nhân sự";
-  }
+  },
+  
 };
 </script>
 <style lang="css" scoped>

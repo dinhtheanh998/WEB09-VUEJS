@@ -1,5 +1,5 @@
 <template lang="">
-  <div class="body__table__data">
+  <div class="body__table__data" :id="id">
     <!-- <button v-if="selectedRow.length>0" @click="deleteMultiRecord">Xóa</button> -->
     <div class="wrap-table">
       <table>
@@ -41,14 +41,15 @@
           <th class="lastcol text-center">Chức năng</th>
         </tr>
         <tbody>
-          <div v-if="!listEmployees">
-            <div colspan="19" class="text-center">Không có dữ liệu</div>
+          <div class="loading" v-if="loading">
+            <div class="loading__icon"></div>
+          </div>   
+          <div v-else-if="!listEmployee" class="loading">
+            <div class="text-center">Không có dữ liệu</div>
           </div>
           <tr
             v-else
-            v-for="item in listEmployee?.length > 0
-              ? listEmployee
-              : listEmployees"
+            v-for="item in listEmployee?.length > 0 && listEmployee"
             class="table__body"
             :key="item.EmployeeCode"
             :class="{ checked: item.isChecked }"
@@ -61,7 +62,7 @@
           >
             <td class="headcol">
               <label
-                class="checkbox custom__checkbox"
+                class="checkbox custom__checkbox" :class="{ 'checked': item.isChecked }"
                 :for-html="item.EmployeeId"
               >
                 <input
@@ -88,7 +89,7 @@
               }}
             </td>
             <td>{{ item.IdentityNumber }}</td>
-            <td>Nhân viên</td>
+            <td>{{ item.DepartmentName }}</td>
             <td>VP01</td>
             <td>Văn Phòng 01</td>
             <td></td>
@@ -126,18 +127,19 @@
         </tbody>
       </table>
     </div>
-    <contentPagging
-      :totalRecord="totalRecord"
-    ></contentPagging>
+    <contentPagging :totalRecord="totalRecord"></contentPagging>
   </div>
   <warningDialogVue
     v-if="showDialogDel.isShow"
     :description="
-      'Bạn có chắc chắn muốn xóa \'' + infoAndCoord.item.EmployeeName + '\' không?'
+      'Bạn có chắc chắn muốn xóa \'' +
+      infoAndCoord.item.EmployeeName +
+      '\' không?'
     "
     :handleDeleteTrue="handleDeleteTrue"
     :handleDeleteFalse="handleDeleteFalse"
     type="warning"
+    btnTextSecondary="Hủy"
   ></warningDialogVue>
   <teleport to="body">
     <ContextMenu
@@ -159,8 +161,9 @@ import {
 import RowDataTable from "./tableRowData.vue";
 import warningDialogVue from "../dialog/warningDialog.vue";
 import ContextMenu from "../dialog/ContextMenu.vue";
-import axios from "axios";
+// import axios from "axios";
 import { mapActions, mapState } from "vuex";
+import { SET_EDITFORM, SET_LIST_DELETE_EMP, SET_MODIFIED_FORM, SET_TITLE_POPUP, STATUS_POPUP } from "@/store/Mutatios.Type";
 
 // import myCheckbox from "../checkbox/myCheckbox.vue";
 export default {
@@ -168,7 +171,7 @@ export default {
     return {
       recordPerPage: 0,
       //Danh sách nhân viên
-      listEmployees: [],
+      // listEmployees: [],
       // Tổng số bản ghi
       totalRecord: 0,
       //Số hàng đã checked
@@ -196,18 +199,25 @@ export default {
     contentPagging,
     warningDialogVue,
     ContextMenu,
-    // myCheckbox,
   },
   props: {
     forceRender: {
       type: Function,
     },
+    id: {
+      type:String,
+    }
   },
   methods: {
+    /**
+     * Click header checkbox thì check toàn bộ các checkbox và thêm vào mảng 
+     * Author : DTANH (01/11/2022)
+     */
     clickCheckAll() {
       if (this.isCheckAll) {
-        this.listEmployees.forEach((item) => {
+        this.listEmployee.forEach((item) => {
           item.isChecked = false;
+          this.$store.commit(SET_LIST_DELETE_EMP,[]);
         });
       }
     },
@@ -217,21 +227,19 @@ export default {
      * Author: DTANH (25/10/2022)
      */
     rowChecked(id) {
-      if (this.selectedRow.includes(id)) {
-        this.selectedRow = this.selectedRow.filter((item) => item !== id);
+      if (this.listDeleteIdEmployee.includes(id)) {
+        this.$store.commit(SET_LIST_DELETE_EMP,[
+          ...this.listDeleteIdEmployee.filter((item) => item !== id),
+        ]);
       } else {
-        this.selectedRow.push(id);
+        this.$store.commit(SET_LIST_DELETE_EMP,[
+          ...this.listDeleteIdEmployee,
+          id,
+        ]);
       }
-      this.isCheckAll = this.selectedRow.length == this.listEmployees.length;
-      this.eventBus.emit("rowSelectDelete", this.selectedRow);
+      this.isCheckAll = this.listDeleteIdEmployee.length == this.listEmployee.length;
     },
-    /** set data
-     * @param {array} data
-     * Author: DTANH (25/10/2022)
-     */
-    setEmployees: function (data) {
-      this.listEmployees = data;
-    },
+    
     /**
      * hiện dialog và lấy Id của nhân viên cần xóa
      * @param {string} id
@@ -272,15 +280,7 @@ export default {
      * Author: DTANH (25/10/2022)
      */
     deleteOneRecord(id) {
-      axios
-        .delete(`https://amis.manhnv.net/api/v1/Employees/${id}`)
-        .then((res) => {
-          console.log(res);
-          this.refeshData(this.recordPerPage);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
+      this.$store.dispatch("deleteEmployee", id);     
     },
     /**
      * Xóa nhiều bản ghi
@@ -298,22 +298,28 @@ export default {
     },
     /**
      * Hiển thị popup
+     * Author : DTANH (01/11/2022)
      */
     showPopup() {
-      this.$store.commit("setTitlePopup", "Sửa nhân viên");
-      this.$store.commit("setShowPopup");
+      this.$store.commit(SET_EDITFORM, true);
+      this.$store.commit(SET_MODIFIED_FORM, true);
+      this.$store.commit(SET_TITLE_POPUP, "Sửa nhân viên");
+      this.$store.commit(STATUS_POPUP);
     },
-    ...mapActions(["filterEmployee", "getEmployeeById"]),
+    ...mapActions(["filterEmployee", "getEmployeeById","deleteEmployee"]),
   },
 
   computed: {
-    ...mapState(["listEmployee", "Employee"]),
+    ...mapState(["listEmployee", "Employee", "listDeleteIdEmployee", "loading"]),
   },
 
   watch: {
     isCheckAll: function () {
-      if (this.isCheckAll)
-        this.listEmployees.forEach((item) => (item.isChecked = true));
+      if (this.isCheckAll) {        
+        this.listEmployee.forEach((item) => (item.isChecked = true));
+        let payload = this.listEmployee.map((item) => item.EmployeeId);
+        this.$store.commit(SET_LIST_DELETE_EMP, payload);
+      }
     },
   },
   created() {
@@ -330,6 +336,11 @@ export default {
       pageNumber: DEFAULT_PAGE_NUMBER,
     });
   },
+  mounted() {
+    document.querySelector(`#${this.id} .wrap-table`).addEventListener("scroll", function (e) {
+      console.log(e)
+    });
+  },
   unmounted() {
     this.eventBus.off("reloadData");
     document.removeEventListener("click", this.closeContextMenu);
@@ -339,4 +350,25 @@ export default {
 
 <style lang="css" scoped>
 @import url(../../css/component/table-data.css);
+.loading {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  
+}
+.loading__icon {
+  width: 50px;
+  height:50px;
+  border-radius: 50%;
+  border: 5px solid var(--primary-color);
+  border-top-color: transparent;
+  border-bottom-color: transparent;
+  animation: spin 1.5s linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
 </style>

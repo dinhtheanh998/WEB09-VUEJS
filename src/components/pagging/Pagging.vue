@@ -1,9 +1,9 @@
 <template lang="">
   <div class="pagging">
-    <button class="pagging__btn" @click="selectPage($event, 1)">
+    <button class="pagging__btn" @click="selectPage($event, 1)" :class="{disable: pageNumber==1 }">
       <i class="icofont-rounded-double-left"></i>
     </button>
-    <button class="pagging__btn" @click="prevPage">
+    <button class="pagging__btn" @click="prevPage" :class="{disable: pageNumber==1 }">
       <i class="icofont-rounded-left"></i>
     </button>
     <button
@@ -41,9 +41,9 @@
       {{ totalPage }}
     </button>
     <button class="pagging__btn">
-      <i class="icofont-rounded-right" @click="nextPage"></i>
+      <i class="icofont-rounded-right" @click="nextPage" :class="{disable: pageNumber==totalPage }"></i>
     </button>
-    <button class="pagging__btn" @click="selectPage($event, totalPage)">
+    <button class="pagging__btn" @click="selectPage($event, totalPage)" :class="{disable: pageNumber==totalPage }">
       <i class="icofont-rounded-double-right"></i>
     </button>
     <div class="pagging__gotoPage" v-show="showGoToPage" id="goToPage">
@@ -66,6 +66,7 @@
   </div>
 </template>
 <script>
+import { CHANGE_PAGE_NUMBER } from "@/store/Mutatios.Type";
 import { mapState, mapActions } from "vuex";
 import ButtonPrimary from "../Button/myButtonPrimary.vue";
 export default {
@@ -136,7 +137,7 @@ export default {
      * chọn số trang
      */
     selectPage(e, value) {
-      this.$store.commit("setPageNumber", Number(value));
+      this.$store.commit(CHANGE_PAGE_NUMBER, Number(value));
       this.showGoToPage = false;
     },
     close(e) {
@@ -210,5 +211,12 @@ export default {
 }
 .active {
   border-color: var(--primary-color);
+}
+.pagging__btn.disable {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+.pagging__btn.disable:hover {
+  background-color: transparent;
 }
 </style>

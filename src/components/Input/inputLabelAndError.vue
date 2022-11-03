@@ -8,12 +8,17 @@
       :name="name"
       :id="name"
       :value="valueInput || ''"
-      @change="onChange"
+      @blur="onChange"
+      @input="onChange"
+      ref="focusMe"
+      autoforcus
     />
     <span class="input__text-error" :class="{show:error}" :title="error">{{error}}</span>
   </div>
 </template>
 <script>
+import { SET_MODIFIED_FORM } from '@/store/Mutatios.Type';
+
 export default {
   data: function () {
     return {
@@ -58,16 +63,26 @@ export default {
       type: [String, Date],
       default: "",
     },
+    autoforcus: {
+      type: Boolean,
+      default: false,
+    },
   },
   methods: {
     onChange: function (event) {
-      this.$store.commit("setModifiedForm",false)
+      this.$store.commit(SET_MODIFIED_FORM,false)
       this.$emit("returnValue", {
         target: this.$props.name,
         value: event.target.value,
       });
     },
   },
+  mounted() {
+    console.log(this.autoforcus);
+    if (this.autoforcus) {     
+      this.$refs.focusMe.focus();
+    }
+  }
 };
 </script>
 <style lang="css" scoped>

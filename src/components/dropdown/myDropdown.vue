@@ -1,5 +1,5 @@
 <template lang="">
-  <div class="dropdown" :id="id">
+  <div class="dropdown" :id="id" :class="{'dropdown--forcus': isOpen}">
     <button
       :class="{ isActive: isOpen }"
       class="dropdown__label"
@@ -18,7 +18,7 @@
         :closeDropdown="callToClose"
         :selectedValue="selectedValue"
         :changePaggingRange="changePaggingRange"
-        :dataValue="item.value"
+        :dataValue="item.value || item.DepartmentId"
         @returnValue="returnValue"
       >
       </Item>
@@ -80,9 +80,9 @@ export default {
       }
     }
   },
-  created() {
-    this.$emit("returnPaggingRange", 10);
-  },
+  // created() {
+  //   this.$emit("returnPaggingRange", 10);
+  // },
   mounted(){
     document.addEventListener('click', this.close)
   },

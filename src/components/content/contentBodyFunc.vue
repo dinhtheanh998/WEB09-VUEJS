@@ -2,7 +2,7 @@
   <div class="body__search__reload">
     <button
       class="delete__multiply"
-      v-show="rowSelected.length > 0"
+      v-show="listDeleteIdEmployee.length > 0"
       @click="onClickDeleteMulti"
     >
       <i class="icofont-delete-alt"></i>
@@ -25,10 +25,12 @@
     <warningDialogVue
       v-if="showDialogDel.isShow"
       :description="
-        'Bạn có chắc chắn muốn xóa ' + rowSelected.length + ' nhân viên không?'
+        'Bạn có chắc chắn muốn xóa ' + listDeleteIdEmployee.length + ' nhân viên không?'
       "
       :handleDeleteFalse="handleDeleteFalse"
       :handleDeleteTrue="handleDeleteTrue"
+      btnTextSecondary="Hủy"
+      type="warning"
     ></warningDialogVue>
   </teleport>
 </template>
@@ -37,7 +39,8 @@ import warningDialogVue from "../dialog/warningDialog.vue";
 import _ from "lodash";
 // import inputIcon from "../Input/inputWithIcon.vue";
 import axios from "axios";
-import { mapActions } from "vuex";
+import { mapActions, mapState } from "vuex";
+import { SEARCH_KEYWORD } from "@/store/Mutatios.Type";
 export default {
   data() {
     return {
@@ -52,11 +55,14 @@ export default {
     // inputIcon,
     warningDialogVue,
   },
+  computed: {
+    ...mapState(["listDeleteIdEmployee"])
+  },
   methods: {
     ...mapActions(["reloadData"]),
     onClickDeleteMulti() {
       this.showDialogDel.isShow = true;
-      this.showDialogDel.data = this.rowSelected;
+      this.showDialogDel.data = this.listDeleteIdEmployee;
     },
     /** chọn hủy trong dialog
      * Author:DTANh (26/10/2022)
@@ -104,16 +110,11 @@ export default {
     },
     searchDebounce: _.debounce(function (e) {
       console.log(e.target.value);
-      this.$store.commit("setSearchKeyword", e.target.value);      
+      this.$store.commit(SEARCH_KEYWORD, e.target.value);      
       this.handleSearchEmployee(e);
     }, 500),
 
     ...mapActions(["searchEmployee", "filterEmployee"]),
-  },
-  created() {
-    this.eventBus.on("rowSelectDelete", (data) => {
-      this.rowSelected = data;
-    });
   },
 };
 </script>

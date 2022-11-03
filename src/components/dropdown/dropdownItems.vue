@@ -1,10 +1,11 @@
 <template lang="">
-  <div class="dropdown__item" @click="doFunc" :data-value="dataValue">
+  <div class="dropdown__item" @click="doFunc" :data-value="dataValue" :class="{active: pageSize == dataValue || dataValue == Employee.DepartmentId}">
     {{ item.text || item.DepartmentName }}
   </div>
 </template>
 <script>
-import {mapMutations} from "vuex"
+import { CHANGE_PAGE_NUMBER, CHANGE_PAGE_SIZE } from "@/store/Mutatios.Type";
+import {mapMutations, mapState} from "vuex"
 export default {
   props: {
     item: {
@@ -32,8 +33,15 @@ export default {
     doFunc() {
       this.selectedValue(this.item.text || this.item.DepartmentName);
       this.closeDropdown();
-      if(this.item.value) {
-        this.$store.commit("setPageSize", this.item.value);
+      if (this.item.value) {
+        console.log(this.pageNumber)
+        let newTotalRecord = this.pageNumber * Number(this.item.value);
+        
+        if(newTotalRecord > this.totalRecord){
+          this.$store.commit(CHANGE_PAGE_NUMBER,1);
+        }
+        this.$store.commit(CHANGE_PAGE_SIZE, this.item.value);
+        
       }
       this.$emit(
         "returnValue",
@@ -45,7 +53,8 @@ export default {
     },
   },
   computed: {
-    ...mapMutations(["setPageSize"])
+    ...mapMutations([CHANGE_PAGE_SIZE]),
+    ...mapState(["pageNumber", "pageSize","totalRecord","Employee"]),
   },
 };
 </script>
@@ -60,6 +69,9 @@ export default {
   font-size: 14px;
 }
 .dropdown__item:hover {
+  background-color: var(--hover-color);
+}
+.dropdown__item.active {
   background-color: var(--hover-color);
 }
 </style>
