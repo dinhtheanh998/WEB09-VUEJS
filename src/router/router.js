@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
-import layoutContent from "../layout/layoutContent.vue";
-import  OtherCom from "../components/Page/OtherComponent.vue"
+import layoutContent from "../layout/LayoutContent.vue";
+import  OtherCom from "../components/page/OtherComponent.vue"
 
 const routes = [
     {

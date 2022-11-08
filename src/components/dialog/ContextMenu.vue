@@ -22,7 +22,9 @@ export default {
         }
     },
     methods: {
-        emmitClickDelete() {
+      emmitClickDelete() {
+        debugger
+        console.log(this.item.EmployeeID)
             this.$emit("clickDelete", this.item.EmployeeId);
         }
     }

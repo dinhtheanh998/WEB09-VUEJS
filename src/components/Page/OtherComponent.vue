@@ -1,6 +1,6 @@
 <template lang="">
     <div>
-        Other Component :))))
+        Other Component
     </div>
 </template>
 <script>

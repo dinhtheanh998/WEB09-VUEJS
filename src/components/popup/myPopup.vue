@@ -62,12 +62,18 @@
                 moveToBot
                 @returnDepartments="returnValue"
                 :defaultValue="Employee.DepartmentName || 'Chọn đơn vị'"
+                :isValidate="error?.DepartmentId"
+                @click="clickDepartment"
               ></myDropdown>
-              <span class="input__text-error">{{ error.Department }}</span>
+              <span
+                class="input__text-error"
+                :class="{ show: error.DepartmentId }"
+                >{{ error.DepartmentId }}</span
+              >
             </div>
             <inputLabelAndError
               label="Chức danh"
-              name="EmployeeCode"
+              name="Position"
               placeholderText="Trưởng phòng kinh doanh"
               tabIndex="4"
               classProps="flex-col w-full wrap__textfield"
@@ -156,12 +162,13 @@
             </div>
             <inputLabelAndError
               label="Số CMND"
-              name="identityNumber"
+              name="IdentityNumber"
               tabIndex="6"
               placeholderText="125816832"
               classProps="flex-col  grow-1 wrap__textfield"
               @returnValue="returnValue"
               :valueInput="Employee.IdentityNumber"
+              :error="error.IdentityNumber"
             ></inputLabelAndError>
             <inputLabelAndError
               label="Ngày cấp"
@@ -205,6 +212,7 @@
               classProps="flex-col w-50 wrap__textfield"
               :valueInput="Employee.TelephoneNumber"
               @returnValue="returnValue"
+              :error="error.TelephoneNumber"
             ></inputLabelAndError>
             <inputLabelAndError
               label="ĐT cố định"
@@ -214,19 +222,19 @@
               classProps="flex-col w-50 wrap__textfield"
               :valueInput="Employee.PhoneNumber"
               @returnValue="returnValue"
+              :error="error.PhoneNumber"
             ></inputLabelAndError>
           </div>
           <div class="flex align-center w-full gap-x-8">
             <inputLabelAndError
               label="Email"
               name="Email"
-              placeholderText="company@gmail.com"
+              placeholderText="company@example.com"
               tabIndex="12"
               classProps="flex-col w-50 wrap__textfield"
               @returnValue="returnValue"
               :error="error.Email"
               :valueInput="Employee.Email"
-              
             ></inputLabelAndError>
           </div>
         </div>
@@ -239,6 +247,7 @@
               classProps="flex-col w-50 wrap__textfield"
               :valueInput="Employee.BankAccountNumber"
               @returnValue="returnValue"
+              :error="error.BankAccountNumber"
             ></inputLabelAndError>
             <inputLabelAndError
               label="Tên ngân hàng"
@@ -288,25 +297,46 @@
         :type="dialogData.type"
         zIndex="true"
         :btnTextPrimary="dialogData.btnText"
-        :handleDeleteTrue="
+        :btnSecondaryChoseNo="dialogData.btnSecondaryChoseNo"
+        :btnTextSecondary="dialogData.btnTextSecondary"
+        :handleSecondaryChoseNo="
+          () => {
+            dialogData.dialogShow = false;
+            handleShowPopup();
+          }
+        "
+        :handleDeleteFalse="
           () => {
             dialogData.dialogShow = false;
           }
         "
+        :handleDeleteTrue="dialogData.handleChoseYes"
       />
     </Teleport>
   </div>
 </template>
 <script>
 // import axios from "axios";
-import myButton from "../Button/myButtonPrimary.vue";
-import inputLabelAndError from "../Input/inputLabelAndError.vue";
-import myDropdown from "../dropdown/myDropdown.vue";
-import warningDialogVue from "../dialog/warningDialog.vue";
+import myButton from "../Button/MyButtonPrimary.vue";
+import inputLabelAndError from "../Input/InputLabelAndError.vue";
+import myDropdown from "../dropdown/MyDropdown.vue";
+import warningDialogVue from "../dialog/WarningDialog.vue";
 import _ from "lodash";
 import { mapActions, mapGetters, mapMutations, mapState } from "vuex";
-import { SET_MODIFIED_FORM, SET_ONE_EMPLOYEE, STATUS_POPUP } from "@/store/Mutatios.Type";
-import { MESSAGE_REQUIRED_EMPLOYEE_CODE, MESSAGE_REQUIRED_EMPLOYEE_NAME, MESSAGE_VALIDATE_EMAIL } from "@/config/Constraint";
+import {
+  SET_MODIFIED_FORM,
+  SET_ONE_EMPLOYEE,
+  STATUS_POPUP,
+} from "@/store/Mutatios.Type";
+import {
+  MESSAGE_REQUIRED_EMPLOYEE_CODE,
+  MESSAGE_REQUIRED_EMPLOYEE_NAME,
+  MESSAGE_REQUIRED_PHONE_LENGTH,
+  MESSAGE_VALIDATE_CMND,
+  MESSAGE_VALIDATE_EMAIL,
+  MESSAGE_VALIDATE_PHONE_NUMBER,
+  REGEX_NUMBER,
+} from "@/config/Constraint";
 export default {
   components: {
     myButton,
@@ -323,21 +353,45 @@ export default {
         DateofBirth: "",
         DepartmentId: "",
         DepartmentName: "",
+        Department: "",
         Email: "",
+        IdentityNumber: "",
+        TelephoneNumber: "",
+        PhoneNumber: "",
+        BankAccountNumber: "",
       },
       dialogData: {
         dialogShow: false,
-        type: "warning",
-        description: "Bạn chưa thay đổi thông tin nào",
-        btnText: "Xác nhận",
-        btnCancelText: "Hủy",
+        type: "",
+        description: "",
+        btnText: "Có",
+        btnTextSecondary: "Hủy",
+        btnSecondaryChoseNo: "Không",
+        handleChoseYes: "",
       },
     };
   },
 
   methods: {
+    clickDepartment() {
+      if (
+        !this.checkPropertyExist(this.Employee, "DepartmentId") ||
+        !this.Employee.DepartmentId
+      ) {
+        // this.$store.commit(SET_ONE_EMPLOYEE, {
+        //   ...this.$store.state.Employee,
+        //   DepartmentId: '',
+        // })
+        this.error.DepartmentId = "Vui lòng chọn phòng ban";
+      } else {
+        this.error.DepartmentId = "";
+      }
+    },
+
     submitForm(e) {
       let isValid = true;
+      e.preventDefault();
+
       this.error = {
         EmployeeName: "",
         EmployeeCode: "",
@@ -346,46 +400,26 @@ export default {
         DepartmentName: "",
         Email: "",
       };
-      e.preventDefault();
-      // validate form
-      if (!this.$store.state.Employee?.EmployeeName) {
-        this.error.EmployeeName = "Vui lòng nhập tên nhân viên";
-        isValid = false;
+      console.log("Kiểm tra EmplpyeeName",this.checkPropertyExist(this.$store.state.Employee, "EmployeeName"))
+      if (!this.checkPropertyExist(this.$store.state.Employee, "EmployeeName")) {
+        this.$store.commit(SET_ONE_EMPLOYEE, {
+          ...this.$store.state.Employee,
+          EmployeeName: "",
+        })
       }
-      if (!this.$store.state.Employee?.EmployeeCode) {
-        this.error.EmployeeCode = "Vui lòng nhập mã nhân viên";
-        isValid = false;
-      } else if (this.$store.state.Employee?.EmployeeCode.length < 6) {
-        this.error.EmployeeCode = "Mã nhân viên phải có ít nhất 6 ký tự";
-        isValid = false;
-      } else if (this.$store.state.Employee?.EmployeeCode.length > 20) {
-        this.error.EmployeeCode = "Mã nhân viên không được quá 20 ký tự";
-        isValid = false;
-      } else if (
-        !this.validateEmployeeCode(this.$store.state.Employee?.EmployeeCode)
-      ) {
-        this.error.EmployeeCode =
-          "Mã nhân viên bắt đầu bằng chữ và kết thúc là số";
-        isValid = false;
+      if(!this.checkPropertyExist(this.$store.state.Employee, "EmployeeCode") ) {
+        this.$store.commit(SET_ONE_EMPLOYEE, {
+          ...this.$store.state.Employee,
+          EmployeeCode: "",
+        })
       }
-      if (
-        this.$store.state.Employee?.Email &&
-        !this.validateEmail(this.$store.state.Employee?.Email)
-      ) {
-        this.error.Email = "Vui lòng nhập đúng định dạng của email";
-        isValid = false;
-      }
-      if (
-        this.$store.state.Employee?.DateofBirth &&
-        this.validateDayOfBirth(this.$store.state.Employee?.DateofBirth)
-      ) {
-        this.error.DateofBirth = "Ngày sinh phải nhỏ hơn ngày hiện tại";
-        isValid = false;
-      }
+
+
+      isValid = this.validateForm();
       if (isValid) {
         this.handleAddData();
         // this.$store.dispatch("addEmployee", this.$store.state.Employee);
-        console.log(_.isEmpty(this.resError));
+        // console.log(_.isEmpty(this.resError));
       }
 
       // call api
@@ -407,6 +441,10 @@ export default {
       return regex.test(value);
     },
 
+    /**
+     * Định dạng email
+     * @param {email} email 
+     */
     validateEmail(email) {
       let regex =
         /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -437,23 +475,31 @@ export default {
           });
           // this.$store.state.Employee[target] = value;
         }
-      } else {
-        if (target == "department") {
-          this.$store.commit(SET_ONE_EMPLOYEE, {
-            ...this.$store.state.Employee,
-            DepartmentId: value.deparmentID,
-            DepartmentName: value.departmentName,
-          });
-        } else {
-          this.$store.commit(SET_ONE_EMPLOYEE, {
-            ...this.$store.state.Employee,
-            [target]: value,
-          });
-        }
       }
+      if (target == "department") {
+        this.$store.commit(SET_ONE_EMPLOYEE, {
+          ...this.$store.state.Employee,
+          DepartmentId: value.deparmentID,
+          DepartmentName: value.departmentName,
+        });
+      } else {
+        this.$store.commit(SET_ONE_EMPLOYEE, {
+          ...this.$store.state.Employee,
+          [target]: value,
+        });
+      }
+      this.validateForm();
+    },
 
+    /**
+     * validate form
+     * Author : DTANH(01/11/2022)
+     */
+    validateForm() {
+      let result = true;
       if (!this.$store.state.Employee?.EmployeeCode) {
         this.error.EmployeeCode = MESSAGE_REQUIRED_EMPLOYEE_CODE;
+        result = false;
       } else {
         this.error.EmployeeCode = "";
       }
@@ -463,6 +509,7 @@ export default {
         this.checkPropertyExist(this.$store.state.Employee, "EmployeeName")
       ) {
         this.error.EmployeeName = MESSAGE_REQUIRED_EMPLOYEE_NAME;
+        result = false;
       } else {
         this.error.EmployeeName = "";
       }
@@ -472,9 +519,89 @@ export default {
         this.checkPropertyExist(this.$store.state.Employee, "Email")
       ) {
         this.error.Email = MESSAGE_VALIDATE_EMAIL;
+        result = false;
       } else {
         this.error.Email = "";
       }
+      if (
+        this.$store.state.Employee?.IdentityNumber &&
+        !this.checkValueWithRegexNumber(
+          this.$store.state.Employee?.IdentityNumber
+        )
+      ) {
+        this.error.IdentityNumber = MESSAGE_VALIDATE_CMND;
+        result = false;
+      } else {
+        this.error.IdentityNumber = "";
+      }
+      if (
+        this.$store.state.Employee?.TelephoneNumber &&
+        !this.checkValueWithRegexNumber(
+          this.$store.state.Employee?.TelephoneNumber
+        )
+      ) {
+        this.error.TelephoneNumber = MESSAGE_VALIDATE_PHONE_NUMBER;
+        result = false;
+      } else if (
+        !this.checkLength(this.$store.state.Employee?.TelephoneNumber, 10)
+      ) {
+        this.error.TelephoneNumber = MESSAGE_REQUIRED_PHONE_LENGTH;
+        result = false;
+      } else {
+        this.error.TelephoneNumber = "";
+      }
+      if (
+        this.$store.state.Employee?.PhoneNumber &&
+        !this.checkValueWithRegexNumber(this.$store.state.Employee?.PhoneNumber)
+      ) {
+        this.error.PhoneNumber = MESSAGE_VALIDATE_PHONE_NUMBER;
+        result = false;
+      } else if (
+        !this.checkLength(this.$store.state.Employee?.PhoneNumber, 11)
+      ) {
+        this.error.PhoneNumber = "Điên thoại cố định tối đa 11 số";
+        result = false;
+      } else {
+        this.error.PhoneNumber = "";
+      }
+      if (
+        this.$store.state.Employee?.BankAccountNumber &&
+        !this.checkValueWithRegexNumber(
+          this.$store.state.Employee?.BankAccountNumber
+        )
+      ) {
+        this.error.BankAccountNumber = "Số tài khoản phải là số";
+        result = false;
+      } else {
+        this.error.BankAccountNumber = "";
+      }
+      if (
+        !this.$store.state.Employee?.DepartmentId &&
+        this.checkPropertyExist(this.$store.state.Employee, "DepartmentId")
+      ) {
+        this.error.DepartmentId = "Hãy chọn ít nhất 1 đơn vị";
+        result = false;
+      } else {
+        this.error.DepartmentId = "";
+      }
+      return result;
+    },
+    /**
+     * Xem dữ liệu có đúng định dạng hay không
+     * Author : DTANH(03/11/2022)
+     */
+    checkValueWithRegexNumber(value) {
+      let regex = REGEX_NUMBER;
+      return regex.test(value);
+    },
+
+    /**
+     * validate độ dài của chuỗi nhập vào
+     * Author : DTANH(03/11/2022)
+     */
+    checkLength(value, length) {
+      let regex = new RegExp(`^.{0,${length}}$`, "i");
+      return regex.test(value);
     },
 
     /**
@@ -513,24 +640,59 @@ export default {
      * Xử lý khi ấn nút cất
      */
     handleSaveData() {
-      if (this.modifiedForm) {
+      // debugger;
+      // this.validateForm();
+      // this.Employee.EmployeeName
+      if (!this.validateForm()) return;
+      if (
+        !_.isEqual(this.$store.state.Employee, this.$store.state.cloneEmployee)
+      ) {
         this.dialogData.dialogShow = true;
-        this.dialogData.description = "Bạn chưa thực hiện thay đổi nào";
+        this.dialogData.type = "info";
+        this.dialogData.description =
+          "Dữ liệu đã bị thay đổi. Bạn có muốn cất không?";
+        this.dialogData.handleChoseYes = this.handleChoseYes;
       } else {
-        if (this.editForm) {
-          this.$store.dispatch("editEmployee", {
-            id: this.$store.state.Employee.EmployeeId,
-            data: this.$store.state.Employee,
-          });
-          this.$store.commit(SET_MODIFIED_FORM, true);
-        } else {
-          this.$store.dispatch("addEmployee", this.$store.state.Employee);
-          this.$store.commit(SET_MODIFIED_FORM, true);
-        }
+        this.handleShowPopup();
+        // if (this.editForm) {
+        //   this.$store.dispatch("editEmployee", {
+        //     id: this.$store.state.Employee.EmployeeId,
+        //     data: this.$store.state.Employee,
+        //   });
+        //   this.$store.commit(SET_MODIFIED_FORM, true);
+        // } else {
+        //   this.$store.dispatch("addEmployee", this.$store.state.Employee);
+        //   this.$store.commit(STATUS_POPUP);
+        //   this.$store.commit(SET_MODIFIED_FORM, true);
+        // }
+      }
+    },
+
+    /**
+     * Xử lý khi ấn nút Có trong popup báo dữ liệu thay đổi
+     */
+    handleChoseYes() {
+      if (this.editForm) {
+        this.$store.dispatch("editEmployee", {
+          id: this.$store.state.Employee.EmployeeId,
+          data: this.$store.state.Employee,
+        });
+        this.$store.commit(SET_MODIFIED_FORM, true);
+      } else {
+        this.$store.dispatch("addEmployee", this.$store.state.Employee);
+        this.$store.commit(STATUS_POPUP);
+        this.$store.commit(SET_MODIFIED_FORM, true);
       }
     },
     /**
-     * lấy tên department theo id
+     * Đóng popup
+     */
+    handleClosePopup() {
+      this.dialogData.dialogShow = false;
+    },
+    /**
+     * Thêm nhân viên
+     * author : DTANH(31/10/2022)
      */
     async handleAddData() {
       await this.$store.dispatch("addEmployee", this.$store.state.Employee);
@@ -546,6 +708,7 @@ export default {
     checkPropertyExist(obj, property) {
       return hasOwnProperty.call(obj, property);
     },
+
     ...mapActions(["getAllDepartment", "editEmployee", "addEmployee"]),
   },
 
@@ -559,6 +722,7 @@ export default {
       "formEmp",
       "resError",
       "editForm",
+      "cloneEmployee",
     ]),
     ...mapMutations([STATUS_POPUP]),
     ...mapGetters(["getDepartmentNameById"]),
@@ -573,7 +737,12 @@ export default {
     resError: function () {
       if (!_.isEmpty(this.resError)) {
         this.dialogData.dialogShow = true;
+        this.dialogData.type = "warning";
         this.dialogData.description = this.resError.errorMsg;
+        this.dialogData.btnText = "Đồng ý";
+        this.dialogData.btnTextSecondary = null;
+        this.dialogData.btnSecondaryChoseNo = null;
+        this.dialogData.handleChoseYes = this.handleClosePopup
       }
     },
   },

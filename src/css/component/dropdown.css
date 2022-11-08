@@ -6,6 +6,7 @@
     border: 1px solid var(--border-color);
     border-radius: 4px;
     transition: all 0.1s linear;
+    width: 100%;
   }
   .dropdown.dropdown--forcus{
     border-color: var(--primary-color);
@@ -44,4 +45,14 @@
   }
   .dropdown-list.bottom {
     top: calc(100% + 1px);
+  }
+
+  .dropdown__icon.open {
+    transform: rotate(180deg);
+  }
+  .icon-top {
+    transform: rotate(180deg);
+  }
+  .dropdown__icon.open.icon-top {
+    transform: rotate(0deg);
   }

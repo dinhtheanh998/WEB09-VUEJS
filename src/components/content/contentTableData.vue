@@ -54,8 +54,8 @@
             :key="item.EmployeeCode"
             :class="{ checked: item.isChecked }"
             @dblclick="
-              async () => {
-                await getEmployeeById(item.EmployeeId);
+              () => {
+                getEmployeeById(item.EmployeeId);
                 showPopup();
               }
             "
@@ -98,9 +98,9 @@
             <td>{{ item.BankAccountNumber }}</td>
             <td>{{ item.BankName }}</td>
             <td>{{ item.BankBranchName }}</td>
-            <td>Cổ nhuế - Bắc từ liêm -hà nội</td>
+            <td>{{item.Adress}}</td>
             <td>{{ item.TelephoneNumber }}</td>
-            <td class="text-right">5.000.000</td>
+            <td class="text-right">{{Math.round(item.Salary)}}</td>
             <td
               class="lastcol text-center"
               :style="{ zIndex: showContextMenu ? 3 : 0 }"
@@ -109,9 +109,9 @@
                 <button
                   class="context__btn-edit"
                   @click="
-                    async () => {
-                      await getEmployeeById(item.EmployeeId);
-                      showPopup();
+                    () => {
+                       getEmployeeById(item.EmployeeId);
+                        showPopup();
                     }
                   "
                 >
@@ -132,9 +132,9 @@
   <warningDialogVue
     v-if="showDialogDel.isShow"
     :description="
-      'Bạn có chắc chắn muốn xóa \'' +
-      infoAndCoord.item.EmployeeName +
-      '\' không?'
+      'Bạn có chắc chắn muốn xóa nhân viên \<' +
+      infoAndCoord.item.EmployeeCode +
+      '\> không?'
     "
     :handleDeleteTrue="handleDeleteTrue"
     :handleDeleteFalse="handleDeleteFalse"
@@ -152,14 +152,14 @@
   </teleport>
 </template>
 <script>
-import contentPagging from "./contentPagging.vue";
+import contentPagging from "./ContentPagging.vue";
 import {
   DEFAULT_PAGE_SIZE,
   DEFAULT_PAGE_NUMBER,
 } from "../../config/Constraint";
 // eslint-disable-next-line no-unused-vars
-import RowDataTable from "./tableRowData.vue";
-import warningDialogVue from "../dialog/warningDialog.vue";
+import RowDataTable from "./TableRowData.vue";
+import warningDialogVue from "../dialog/WarningDialog.vue";
 import ContextMenu from "../dialog/ContextMenu.vue";
 // import axios from "axios";
 import { mapActions, mapState } from "vuex";
@@ -221,6 +221,7 @@ export default {
         });
       }
     },
+
     /**
      * Đưa các id của nhân viên được chọn vào mảng selectedRow
      * @param {string id employee} id
@@ -249,6 +250,7 @@ export default {
       this.showDialogDel.isShow = true;
       this.showDialogDel.id = id;
     },
+
     /**
      * Đồng ý xóa nhân viên
      * Author: DTANH (25/10/2022)
@@ -259,6 +261,7 @@ export default {
       this.showDialogDel.id = null;
       console.log(this.listEmployees);
     },
+
     /**
      * Hủy xóa nhân viên
      * Author: DTANH (25/10/2022)
@@ -266,7 +269,10 @@ export default {
     handleDeleteFalse() {
       this.showDialogDel.isShow = false;
     },
-    /** lấy thông tin nhân viên và tọa độ vừa click */
+
+    /** lấy thông tin nhân viên và tọa độ vừa click
+     * @param {object} item
+     */
     handleClickContextIcon(e, item) {
       this.showContextMenu = !this.showContextMenu;
       this.infoAndCoord = {
@@ -274,6 +280,7 @@ export default {
         coord: e.target.getBoundingClientRect(),
       };
     },
+
     /**
      * Xóa nhân viên
      * @param {string} id
@@ -282,6 +289,7 @@ export default {
     deleteOneRecord(id) {
       this.$store.dispatch("deleteEmployee", id);     
     },
+
     /**
      * Xóa nhiều bản ghi
      * Author: DTANH (25/10/2022)
@@ -291,13 +299,16 @@ export default {
         this.deleteOneRecord(item);
       });
     },
-    /** close context Menu */
+    /**
+     * Ẩn context menu khi click ra ngoài
+     */
     closeContextMenu(e) {
       if (e.target.closest(".context__icon")) return;
       this.showContextMenu = false;
     },
+
     /**
-     * Hiển thị popup
+     * Hiển thị popup và thay đổi title của popup
      * Author : DTANH (01/11/2022)
      */
     showPopup() {
@@ -306,14 +317,17 @@ export default {
       this.$store.commit(SET_TITLE_POPUP, "Sửa nhân viên");
       this.$store.commit(STATUS_POPUP);
     },
-    ...mapActions(["filterEmployee", "getEmployeeById","deleteEmployee"]),
+    ...mapActions(["filterEmployee", "getEmployeeById","deleteEmployee","getAllDepartment"]),
   },
 
   computed: {
-    ...mapState(["listEmployee", "Employee", "listDeleteIdEmployee", "loading"]),
+    ...mapState(["listEmployee", "Employee", "listDeleteIdEmployee", "loading","listDepartment"]),
   },
 
   watch: {
+    /**
+     * Theo dõi nếu isCheckALl đc check thì tất cả các checkbox trong table được check
+     */
     isCheckAll: function () {
       if (this.isCheckAll) {        
         this.listEmployee.forEach((item) => (item.isChecked = true));
@@ -335,6 +349,7 @@ export default {
       pageSize: DEFAULT_PAGE_SIZE,
       pageNumber: DEFAULT_PAGE_NUMBER,
     });
+    this.$store.dispatch("getAllDepartment");
   },
   mounted() {
     document.querySelector(`#${this.id} .wrap-table`).addEventListener("scroll", function (e) {

@@ -13,10 +13,11 @@
   </div>
 </template>
 <script>
-import { CLEAR_EMPLOYEE, SET_TITLE_POPUP, STATUS_POPUP } from "@/store/Mutatios.Type";
+import { CLEAR_EMPLOYEE, SET_ONE_EMPLOYEE, SET_TITLE_POPUP, STATUS_POPUP } from "@/store/Mutatios.Type";
 import { mapState } from "vuex";
-import myButton from "../Button/myButtonPrimary.vue";
-import myPopup from "../popup/myPopup.vue";
+import myButton from "../Button/MyButtonPrimary.vue";
+import myPopup from "../popup/MyPopup.vue";
+import { DEFAULT_GENDER } from '@/config/Constraint';
 export default {
   components: {
     myButton,
@@ -33,11 +34,21 @@ export default {
     ...mapState(["Employee", "showPopup"]),
   },
   methods: {
+    /**
+     * Hàm hiển thị popup và thay đổi title của popup
+     * Author : DTANH (30/10/2022)
+     */
     handleShowPopup() {
       this.$store.commit(CLEAR_EMPLOYEE);
+      this.$store.commit(SET_ONE_EMPLOYEE, DEFAULT_GENDER)
       this.$store.commit(SET_TITLE_POPUP, "Thêm mới nhân viên");
       this.$store.commit(STATUS_POPUP);
     },
+
+    /**
+     * Load lại dữ liệu
+     * Author : DTANH (30/10/2022)
+     */
     reloadData() {
       this.refeshData(this.recordPerPage);
     },

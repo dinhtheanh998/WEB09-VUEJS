@@ -85,7 +85,7 @@ export default {
   }
 };
 </script>
-<style lang="css" scoped>
+<style lang="css">
 .wrap__textfield {
   gap: 8px 0;
   margin-bottom: 3px;

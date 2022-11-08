@@ -1,12 +1,12 @@
 <template lang="">
-  <div class="dropdown" :id="id" :class="{'dropdown--forcus': isOpen}">
+  <div class="dropdown" :id="id" :class="{'dropdown--forcus': isOpen, isValidate: isValidate !=''  }"> 
     <button
       :class="{ isActive: isOpen }"
       class="dropdown__label"
       @click.prevent="isOpen = !isOpen"
     >
-      <div class="dropdown__label--text">{{ value || defaultValue }}</div>
-      <div class="dropdown__icon">
+      <div class="dropdown__label--text">{{defaultValue }}</div>
+      <div class="dropdown__icon" :class="{open : isOpen , 'icon-top':moveToTop}">
         <i class="icofont-caret-down"></i>
       </div>
     </button>
@@ -26,7 +26,7 @@
   </div>
 </template>
 <script>
-import Item from "./dropdownItems.vue";
+import Item from "./DropdownItems.vue";
 export default {
   components: {
     Item,
@@ -61,6 +61,9 @@ export default {
     defaultValue: {
       type: [Number, String],
     },
+    isValidate: {
+      type: String,
+    }
   },
   methods: {
     callToClose() {
@@ -93,4 +96,7 @@ export default {
 </script>
 <style lang="css" scoped>
  @import url("../../css/component/dropdown.css");
+ .dropdown.isValidate{
+   border: 1px solid red;
+ }
 </style>

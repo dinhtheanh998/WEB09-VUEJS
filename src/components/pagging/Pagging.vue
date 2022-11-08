@@ -1,11 +1,12 @@
 <template lang="">
   <div class="pagging">
-    <button class="pagging__btn" @click="selectPage($event, 1)" :class="{disable: pageNumber==1 }">
+    <!-- <button class="pagging__btn" @click="selectPage($event, 1)" :class="{disable: pageNumber==1 }">
       <i class="icofont-rounded-double-left"></i>
-    </button>
-    <button class="pagging__btn" @click="prevPage" :class="{disable: pageNumber==1 }">
+    </button> -->
+    <!-- <button class="pagging__btn" @click="prevPage" :class="{disable: pageNumber==1 }">
       <i class="icofont-rounded-left"></i>
-    </button>
+    </button> -->
+    <div :class="{disable: pageNumber==1 }" @click="prevPage" class="paggingText">Trước</div>
     <button
       class="pagging__btn"
       v-show="pageNumber != 1"
@@ -40,12 +41,15 @@
     >
       {{ totalPage }}
     </button>
-    <button class="pagging__btn">
+    <!-- <button class="pagging__btn">
       <i class="icofont-rounded-right" @click="nextPage" :class="{disable: pageNumber==totalPage }"></i>
-    </button>
-    <button class="pagging__btn" @click="selectPage($event, totalPage)" :class="{disable: pageNumber==totalPage }">
+    </button> -->
+    <div :class="{disable: pageNumber==totalPage }" @click="nextPage" class="paggingText">
+      Sau
+    </div>
+    <!-- <button class="pagging__btn" @click="selectPage($event, totalPage)" :class="{disable: pageNumber==totalPage }">
       <i class="icofont-rounded-double-right"></i>
-    </button>
+    </button> -->
     <div class="pagging__gotoPage" v-show="showGoToPage" id="goToPage">
       <div class="pagging__gotoPage--title">Chọn trang bạn muốn tới</div>
       <div class="pagging__gotoPage-input">
@@ -68,7 +72,7 @@
 <script>
 import { CHANGE_PAGE_NUMBER } from "@/store/Mutatios.Type";
 import { mapState, mapActions } from "vuex";
-import ButtonPrimary from "../Button/myButtonPrimary.vue";
+import ButtonPrimary from "../Button/MyButtonPrimary.vue";
 export default {
   data() {
     return {
@@ -140,6 +144,10 @@ export default {
       this.$store.commit(CHANGE_PAGE_NUMBER, Number(value));
       this.showGoToPage = false;
     },
+    /**
+     * Đóng popup chọn trang
+     * Author: DTANH(30/10/2022)
+     */
     close(e) {
       if (
         !e.target.closest("#goToPage") &&
@@ -212,11 +220,14 @@ export default {
 .active {
   border-color: var(--primary-color);
 }
-.pagging__btn.disable {
+.pagging__btn.disable, .paggingText.disable {
   cursor: not-allowed;
   opacity: 0.5;
 }
 .pagging__btn.disable:hover {
   background-color: transparent;
+}
+.paggingText{
+  cursor: pointer;
 }
 </style>

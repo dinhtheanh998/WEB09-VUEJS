@@ -6,8 +6,8 @@
 </template>
 <script>
 
-import leftHeader from "../components/header/leftHeader.vue"
-import rightHeader from "../components/header/rightHeader.vue"
+import leftHeader from "../components/header/LeftHeader.vue"
+import rightHeader from "../components/header/RightHeader.vue"
 export default {
     components: {
         leftHeader,

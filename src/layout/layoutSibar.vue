@@ -5,8 +5,8 @@
   </div>
 </template>
 <script>
-import topSidebar from "../components/sidebar/topSidebar.vue";
-import menuItems from "../components/sidebar/menuItems.vue";
+import topSidebar from "../components/sidebar/TopSidebar.vue";
+import menuItems from "../components/sidebar/MenuItems.vue";
 export default {
   data: function () {
     return {

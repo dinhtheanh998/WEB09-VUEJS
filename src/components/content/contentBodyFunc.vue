@@ -35,7 +35,7 @@
   </teleport>
 </template>
 <script>
-import warningDialogVue from "../dialog/warningDialog.vue";
+import warningDialogVue from "../dialog/WarningDialog.vue";
 import _ from "lodash";
 // import inputIcon from "../Input/inputWithIcon.vue";
 import axios from "axios";
@@ -60,16 +60,25 @@ export default {
   },
   methods: {
     ...mapActions(["reloadData"]),
+    
+    /**
+     * @description: Hàm xử lý khi click vào nút xóa nhiều nhân viên
+     */
     onClickDeleteMulti() {
       this.showDialogDel.isShow = true;
       this.showDialogDel.data = this.listDeleteIdEmployee;
     },
+
     /** chọn hủy trong dialog
      * Author:DTANh (26/10/2022)
      */
     handleDeleteFalse() {
       this.showDialogDel.isShow = false;
     },
+
+    /** 
+     * Chọn xác nhận xóa nhiều bản ghi trong dialog
+    */
     handleDeleteTrue() {
       this.showDialogDel.data.forEach((item) => {
         axios
@@ -83,6 +92,11 @@ export default {
       });
       this.showDialogDel.isShow = false;
     },
+
+    /** 
+     * Xử lý tìm kiếm theo từ khóa nếu có giá trị trong ô input hoặc không có giá trị
+     * Author:DTANh (30/10/2022)     
+    */
     handleSearchEmployee(e) {
       if (e.target.value.length > 0) {
         console.log(e.target.value);
@@ -97,6 +111,11 @@ export default {
         });
       }
     },
+
+    /**
+     * Debounce cho hàm tìm kiếm
+     * Author:DTANh (30/10/2022)
+     */
     debounce(fn, delay) {
       let timer = null;
       return function () {
@@ -108,12 +127,16 @@ export default {
         }, delay);
       };
     },
+
+    /**
+     * Gọi hàm debounce
+     * Author:DTANh (30/10/2022)
+    */
     searchDebounce: _.debounce(function (e) {
       console.log(e.target.value);
       this.$store.commit(SEARCH_KEYWORD, e.target.value);      
       this.handleSearchEmployee(e);
     }, 500),
-
     ...mapActions(["searchEmployee", "filterEmployee"]),
   },
 };

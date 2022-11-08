@@ -9,18 +9,18 @@
   </div>
   <!-- <mydialog description="Bạn có muốn xóa nhân viên này không"></mydialog> -->
   <!-- <myCheckbox></myCheckbox> -->
-  <TestComponentVue></TestComponentVue>
+  <!-- <TestComponentVue></TestComponentVue>
   <div style="margin:32px 0"></div>
-  <PaggingVue :totalPage="6" :numberPageDisplay="2"></PaggingVue>
+  <PaggingVue :totalPage="6" :numberPageDisplay="2"></PaggingVue>  
+  <button @click="showToast">Show toast</button> -->
   <ToastTiFiVue></ToastTiFiVue>
-  <button @click="showToast">Show toast</button>
 </template>
 
 <script>
-import layoutSibar from "./layout/layoutSibar.vue";
-import layoutHeader from "./layout/layoutHeader.vue";
-import TestComponentVue from "./components/TestComponent.vue";
-import PaggingVue from "./components/pagging/Pagging.vue";
+import layoutSibar from "./layout/LayoutSibar.vue";
+import layoutHeader from "./layout/LayoutHeader.vue";
+// import TestComponentVue from "./components/TestComponent.vue";
+// import PaggingVue from "./components/pagging/Pagging.vue";
 import ToastTiFiVue from "./components/toastifi/ToastTiFi.vue";
 import { mapState } from 'vuex';
 import { SET_TOAST } from "./store/Mutatios.Type";
@@ -39,8 +39,8 @@ export default {
   components: {
     layoutSibar,
     layoutHeader,
-    TestComponentVue,
-    PaggingVue,
+    // TestComponentVue,
+    // PaggingVue,
     ToastTiFiVue,
     // layoutContent,
     // myCheckbox
