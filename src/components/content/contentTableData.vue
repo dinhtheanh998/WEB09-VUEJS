@@ -7,6 +7,7 @@
           <th class="headcol">
             <label
               class="checkbox custom__checkbox"
+              :class="{ checked: isCheckAll}"
               for-html="checkbox__header"
             >
               <input
@@ -21,30 +22,26 @@
               </div>
             </label>
           </th>
-          <th>Mã nhân viên</th>
-          <th>Tên nhân viên</th>
-          <th>Giới tính</th>
-          <th class="text-center">Ngày sinh</th>
-          <th title="Số chứng minh nhân dân">Số CMND</th>
-          <th>Chức Danh</th>
-          <th>Mã đơn vị</th>
-          <th>Tên đơn vị</th>
-          <th title="Tên nhóm khách hàng, nhà cung cấp">Nhóm KH, NCC</th>
-          <th title="Tài khoản công nợ phải thu">Tk Công nợ phải thu</th>
-          <th title="Tài khoản công nợ phải trả">Tk Công nợ phải trả</th>
-          <th>Số tài khoản</th>
-          <th>Tên ngân hàng</th>
-          <th title="Chi nhánh tài khoản ngân hàng">Chi nhánh TK ngân hàng</th>
-          <th>Địa chỉ</th>
-          <th title="Điện thoại di động">ĐT Di động</th>
-          <th class="text-right">Tiền Lương</th>
-          <th class="lastcol text-center">Chức năng</th>
+          <th data-name="EmployeeCode" @click="setQueryFilter">{{FieldName.employeeCode}}</th>
+          <th data-name="EmployeeName" @click="setQueryFilter">{{FieldName.employeeName}}</th>
+          <th data-name="">{{FieldName.gender}}</th>
+          <th data-name="" class="text-center">{{FieldName.dateOfBirth}}</th>
+          <th data-name="IndentityNumber" :title="Tooltip.indentityNumber" @click="setQueryFilter">{{FieldName.identityNumber}}</th>
+          <th data-name="" >{{FieldName.position}}</th>
+          <th data-name="">{{FieldName.departmentCode}}</th>
+          <th data-name="">{{FieldName.departmentName}}</th>
+          <th data-name="BankNumber" @click="setQueryFilter">{{FieldName.bankNumber}}</th>
+          <th data-name="BankName" @click="setQueryFilter">{{FieldName.bankName}}</th>
+          <th data-name="BankBranch" :title="Tooltip.bankBranch" @click="setQueryFilter">{{FieldName.branchName}}</th>
+          <th data-name="">{{FieldName.address}}</th>
+          <th data-name="" :title="Tooltip.telePhoneNumber">{{FieldName.phoneNumber}}</th>
+          <th data-name="" class="lastcol text-center">Chức năng</th>
         </tr>
         <tbody>
           <div class="loading" v-if="loading">
             <div class="loading__icon"></div>
           </div>   
-          <div v-else-if="!listEmployee" class="loading">
+          <div v-else-if="!listEmployee || listEmployee.length == 0" class="loading">
             <div class="text-center">Không có dữ liệu</div>
           </div>
           <tr
@@ -53,12 +50,7 @@
             class="table__body"
             :key="item.EmployeeCode"
             :class="{ checked: item.isChecked }"
-            @dblclick="
-              () => {
-                getEmployeeById(item.EmployeeId);
-                showPopup();
-              }
-            "
+            v-on:dblclick="handleDoubleClickRow(item)"
           >
             <td class="headcol">
               <label
@@ -80,27 +72,23 @@
             <td>{{ item.EmployeeCode }}</td>
             <td>{{ item.EmployeeName }}</td>
             <td>
-              {{ item.GenderName || "" }}
+              {{ handleGender(item.Gender) || "" }}
             </td>
             <td class="text-center">
               {{
-                item.DateOfBirth &&
-                new Date(item.DateOfBirth).toLocaleDateString("vi-VN")
+                item.DateofBirth &&
+                new Date(item.DateofBirth).toLocaleDateString("en-GB")
               }}
             </td>
             <td>{{ item.IdentityNumber }}</td>
-            <td>{{ item.DepartmentName }}</td>
-            <td>VP01</td>
-            <td>Văn Phòng 01</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td>{{ item.BankAccountNumber }}</td>
+            <td>{{ item.JobPositionName }}</td>
+            <td>{{item.DepartmentCode}}</td>
+            <td>{{item.DepartmentName}}</td>
+            <td>{{ item.BankNumber }}</td>
             <td>{{ item.BankName }}</td>
-            <td>{{ item.BankBranchName }}</td>
+            <td>{{ item.BankBranch}}</td>
             <td>{{item.Adress}}</td>
             <td>{{ item.TelephoneNumber }}</td>
-            <td class="text-right">{{Math.round(item.Salary)}}</td>
             <td
               class="lastcol text-center"
               :style="{ zIndex: showContextMenu ? 3 : 0 }"
@@ -110,6 +98,7 @@
                   class="context__btn-edit"
                   @click="
                     () => {
+                      // getEmployeeByCode(item.EmployeeCode);
                        getEmployeeById(item.EmployeeId);
                         showPopup();
                     }
@@ -150,34 +139,41 @@
       id="context__menu"
     ></ContextMenu>
   </teleport>
+  <teleport to='body'>
+    <FilterConditionVue :typeFilter="1" v-if="filterInfo.status" :coord="filterInfo.coord" :name="filterInfo.name" :title="filterInfo.title"></FilterConditionVue>
+  </teleport>
 </template>
 <script>
 import contentPagging from "./ContentPagging.vue";
+import FilterConditionVue from "../dialog/FilterCondition.vue";
 import {
   DEFAULT_PAGE_SIZE,
   DEFAULT_PAGE_NUMBER,
-} from "../../config/Constraint";
+} from "../../config/Common";
 // eslint-disable-next-line no-unused-vars
 import RowDataTable from "./TableRowData.vue";
 import warningDialogVue from "../dialog/WarningDialog.vue";
 import ContextMenu from "../dialog/ContextMenu.vue";
 // import axios from "axios";
 import { mapActions, mapState } from "vuex";
-import { SET_EDITFORM, SET_LIST_DELETE_EMP, SET_MODIFIED_FORM, SET_TITLE_POPUP, STATUS_POPUP } from "@/store/Mutatios.Type";
-
-// import myCheckbox from "../checkbox/myCheckbox.vue";
+import { SET_CHECK_ALL, SET_EDITFORM, SET_LIST_DELETE_EMP, SET_MODIFIED_FORM, SET_TITLE_POPUP, STATUS_POPUP } from "@/store/Mutatios.Type";
+import { GENDER } from "../../Enums/Enums";
+import { FIELD_NAME , TOOLTIP} from "../../resource/ResourceVN";
 export default {
   data: function () {
     return {
+      // số bản ghi trên trang
       recordPerPage: 0,
-      //Danh sách nhân viên
-      // listEmployees: [],
+ 
       // Tổng số bản ghi
       totalRecord: 0,
+
       //Số hàng đã checked
       selectedRow: [],
+
       //Hiển thị dialog
       showDialog: false,
+
       //Hiển thị dialog xóa
       showDialogDel: {
         isShow: false,
@@ -185,20 +181,27 @@ export default {
       },
       //Hiển thị context menu
       showContextMenu: false,
-      // checked all
-      isCheckAll: false,
+   
       //Thông tin và tọa độ của context menu
       infoAndCoord: {
         item: null,
+
         coord: {},
       },
+
+      // load lại dữ liệu
       refeshData: Function,
+
+      FieldName: FIELD_NAME,
+      Tooltip: TOOLTIP
+      
     };
   },
   components: {
     contentPagging,
     warningDialogVue,
     ContextMenu,
+    FilterConditionVue
   },
   props: {
     forceRender: {
@@ -210,15 +213,72 @@ export default {
   },
   methods: {
     /**
+     * Hiển thị filter nâng cao
+     * @param {*} e 
+     */
+    setQueryFilter(e) {
+      console.dir(e.target)
+      this.$store.commit("setFilterInfo", {
+        coord: e.target.getBoundingClientRect(),
+        name: e.target.dataset.name,
+        status: !this.$store.state.filterInfo.status,
+        title: e.target.innerHTML,
+      });
+    },
+
+    /**
+     * Mở popup sửa khi double click vào dòng
+     * Author : DTANH (25/10/2022)
+    */
+    handleDoubleClickRow(item) {
+      this.getEmployeeById(item.EmployeeId);
+      this.showPopup();
+    },
+
+    /**
+     *  Xử lý hiển thị giới tính theo số ( 0 ,1, 2)
+     * Author : DTANH (25/10/2022)
+     */
+    handleGender(gender) {
+      try {
+        let gen = "";
+        switch (gender) {
+          case GENDER.MALE:
+            gen = "Nam";
+            break;
+            case GENDER.FEMALE:
+              gen = "Nữ";
+            break;
+            case GENDER.OTHER:
+            gen = "Khác";
+            break;
+        }
+        return gen
+      } catch (err) {
+        console.log(err)
+      }
+    },
+    /**
      * Click header checkbox thì check toàn bộ các checkbox và thêm vào mảng 
      * Author : DTANH (01/11/2022)
      */
     clickCheckAll() {
-      if (this.isCheckAll) {
-        this.listEmployee.forEach((item) => {
-          item.isChecked = false;
-          this.$store.commit(SET_LIST_DELETE_EMP,[]);
-        });
+      try {
+        if (this.isCheckAll) {
+          this.listEmployee.forEach((item) => {
+            item.isChecked = false;
+            this.$store.commit(SET_CHECK_ALL, false);
+            this.$store.commit(SET_LIST_DELETE_EMP,[]);
+          });
+        }else {
+          this.listEmployee.forEach((item) => {
+            item.isChecked = true;
+            this.$store.commit(SET_CHECK_ALL, true);
+            this.$store.commit(SET_LIST_DELETE_EMP, this.listEmployee);
+          });
+        }
+      } catch (err) {
+        console.log(err)
       }
     },
 
@@ -238,6 +298,7 @@ export default {
           id,
         ]);
       }
+      this.$store.commit(SET_CHECK_ALL, this.listDeleteIdEmployee.length == this.listEmployee.length);
       this.isCheckAll = this.listDeleteIdEmployee.length == this.listEmployee.length;
     },
     
@@ -259,7 +320,6 @@ export default {
       this.deleteOneRecord(this.showDialogDel.id); // console.log("Xóa bản ghi có id là:", );
       this.showDialogDel.isShow = false;
       this.showDialogDel.id = null;
-      console.log(this.listEmployees);
     },
 
     /**
@@ -272,6 +332,7 @@ export default {
 
     /** lấy thông tin nhân viên và tọa độ vừa click
      * @param {object} item
+     * Author : DTANH (25/10/2022)
      */
     handleClickContextIcon(e, item) {
       this.showContextMenu = !this.showContextMenu;
@@ -301,6 +362,7 @@ export default {
     },
     /**
      * Ẩn context menu khi click ra ngoài
+     * Author : DTANH (25/10/2022)
      */
     closeContextMenu(e) {
       if (e.target.closest(".context__icon")) return;
@@ -321,7 +383,7 @@ export default {
   },
 
   computed: {
-    ...mapState(["listEmployee", "Employee", "listDeleteIdEmployee", "loading","listDepartment"]),
+    ...mapState(["listEmployee", "Employee", "listDeleteIdEmployee", "loading","listDepartment","isCheckAll","filterInfo"]),
   },
 
   watch: {
@@ -352,9 +414,7 @@ export default {
     this.$store.dispatch("getAllDepartment");
   },
   mounted() {
-    document.querySelector(`#${this.id} .wrap-table`).addEventListener("scroll", function (e) {
-      console.log(e)
-    });
+    
   },
   unmounted() {
     this.eventBus.off("reloadData");
@@ -370,7 +430,6 @@ export default {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  
 }
 .loading__icon {
   width: 50px;

@@ -18,3 +18,5 @@ export const SET_EDITFORM = "setEditForm";
 export const SET_LIST_DELETE_EMP ="setListDeleteIdEmployee";
 export const SET_ONE_EMPLOYEE ="setSingleEmployee";
 export const SET_TOAST = "setToast";
+export const SET_NEW_CODE = "getNewCode";
+export const SET_CHECK_ALL = "setCheckAll"

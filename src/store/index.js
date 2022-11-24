@@ -2,13 +2,14 @@ import axios from "axios";
 import { createStore } from "vuex";
 import {
   API,
+  DEFAULT_GENDER,
   DEFAULT_PAGE_NUMBER,
   DEFAULT_PAGE_SIZE,
   SECON_API,
   TIMEOUT_SEC,
   TIME_TO_SHOW_TOAST,
   // ID_DEPARTMENT_DEFAULT,
-} from "../config/Constraint";
+} from "../config/Common";
 import {
   FETCH_START,
   SET_TOAST,
@@ -29,6 +30,8 @@ import {
   CHANGE_PAGE_NUMBER,
   FETCH_EMPLOYEE,
   FETCH_DEPARTMENT,
+  SET_NEW_CODE,
+  SET_CHECK_ALL,
 } from "./Mutatios.Type";
 
 const timeout = function (s) {
@@ -43,46 +46,99 @@ export default createStore({
   state: {
     //hiển thị loading
     loading: false,
+
     // Danh sách phòng ban
     listDepartment: [],
+
     //danh sách nhân viên
     listEmployee: [],
+
     //danh sách nhân viên đã chọn để xóa
     listDeleteIdEmployee: [],
+
     // số lượng bản ghi / trang
     pageSize: DEFAULT_PAGE_SIZE,
+
     // số trang hiện tại
     pageNumber: DEFAULT_PAGE_NUMBER,
+
     // tổng số trang
     totalPage: 0,
+
     // tông số bản ghi
     totalRecord: 0,
+
     // từ khóa tìm kiếm
     searchKeyword: null,
+
     // thông tin của 1 nhân viên
     Employee: {
       Gender: 1,
     },
+
     // Bản sao chép của Employee ( dùng để so sánh khi thay đổi thông tin nhân viên)
     cloneEmployee: {},
+
     // trạng thái của popup
     showPopup: false,
+
     // Là true nếu là thêm mới, false nếu là sửa
     modifiedForm: true,
+
     // tiêu đề của popup
     titlePopup: "",
+
     // là false nếu là thêm mới, true nếu là sửa
     editForm: false,
+
     // thông báo lỗi trả về từ serve
     resError: {},
+
     // thông báo toast
     toastState: {
       show: false,
       type: "success",
       message: "",
     },
+
+    // Mã nhân viên mới
+    newEmployeeCode: "",
+
+    // check all
+    isCheckAll: false,
+
+    // Filter nhiều điều kiện
+    filterCondition: {},
+
+    // Thông tin cột filter
+    filterInfo: {
+      status: false,
+      name: "",
+      coord: {},
+      title: "",
+    },
   },
+
   mutations: {
+    //
+    setErrorValid(state, payload) {
+      state.errorValid = payload;
+    },
+    // set filterInfo
+    setFilterInfo(state, payload) {
+      state.filterInfo = payload;
+    },
+
+    //setFilter
+    setFilterCondition(state, payload) {
+      state.filterCondition = payload;
+    },
+
+    // Thay đổi trạng thái của isCheckAll
+    [SET_CHECK_ALL](state, payload) {
+      state.isCheckAll = payload;
+    },
+
     // Sao chép employee vào cloneEmployee
     copyEmployee(state, employee) {
       state.cloneEmployee = { ...employee };
@@ -227,16 +283,29 @@ export default createStore({
     [SET_TOAST](state, payload) {
       state.toastState = payload;
     },
+
+    /**
+     * Lấy mã nhân viên mới
+     */
+    [SET_NEW_CODE](state, payload) {
+      state.newEmployeeCode = payload;
+    },
   },
+
   actions: {
     /**
      * Lấy tất cả các phòng ban
      * Author: DTANH(29/10/2022)
      */
     getAllDepartment({ commit }) {
-      axios.get(`${SECON_API.GET_ALL_DEPARTMENT}`).then((res) => {
-        commit(FETCH_DEPARTMENT, res.data);
-      });
+      axios
+        .get(`${SECON_API.GET_ALL_DEPARTMENT}`)
+        .then((res) => {
+          commit(FETCH_DEPARTMENT, res.data);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     },
 
     /**
@@ -254,6 +323,9 @@ export default createStore({
           commit(SET_TOTAL_PAGE, res.data.TotalPage);
           commit(SET_TOTAL_RECORD, res.data.TotalRecord);
           commit(FETCH_START, false);
+        })
+        .catch((err) => {
+          console.log(err);
         });
     },
 
@@ -261,27 +333,6 @@ export default createStore({
      * Phân trang nhân viên
      * Author: DTANH(29/10/2022)
      * */
-    // async filterEmployee({ commit, getters }, { pageSize, pageNumber }) {
-    //   if (getters["keyWord"]) {
-    //     commit(CHANGE_PAGE_NUMBER, 1);
-    //   }
-    //   try {
-    //     commit(FETCH_START, true);
-    //     let callAPI = axios.get(
-    //       `${
-    //         API.GET_ALL_EMPLOYEE
-    //       }/filter?pageSize=${pageSize}&pageNumber=${pageNumber}${
-    //         getters["keyWord"] ? `&employeeFilter=${getters["keyWord"]}` : ""
-    //       }`
-    //     );
-    //     const res = await Promise.race([callAPI, timeout(TIMEOUT_SEC)]);
-    //     commit(FETCH_EMPLOYEE, res.data.Data);
-    //     commit(SET_TOTAL_PAGE, res.data.TotalPage);
-    //     commit(SET_TOTAL_RECORD, res.data.TotalRecord);
-    //     commit(FETCH_START, false);
-    //   } catch (error) {
-    //     commit(FETCH_START, false);
-    //   }
     async filterEmployee({ commit, getters }, { pageSize, pageNumber }) {
       if (getters["keyWord"]) {
         commit(CHANGE_PAGE_NUMBER, 1);
@@ -289,13 +340,12 @@ export default createStore({
       try {
         commit(FETCH_START, true);
         let callAPI = axios.get(
-          `${
-            SECON_API.FILTER_EMPLOYEE
-          }pageSize=${pageSize}&pageNumber=${pageNumber}${
-            getters["keyWord"] ? `&employeeFilter=${getters["keyWord"]}` : ""
-          }`
+          `${SECON_API.FILTER_EMPLOYEE}${
+            getters["keyWord"] ? `keyword=${getters["keyWord"]}&` : ""
+          }pageSize=${pageSize}&pageNumber=${pageNumber}`
         );
         const res = await Promise.race([callAPI, timeout(TIMEOUT_SEC)]);
+        console.log(res);
         commit(FETCH_EMPLOYEE, res.data.Data);
         commit(SET_TOTAL_PAGE, res.data.TotalPage);
         commit(SET_TOTAL_RECORD, res.data.TotalRecord);
@@ -325,27 +375,11 @@ export default createStore({
      * Lấy thông tin nhân viên theo id
      * Author: DTANH(30/10/2022)
      */
-    // getEmployeeById({ commit, getters,state }, id) {
-    //   try {
-    //     axios.get(`${API.GET_ALL_EMPLOYEE}/${id}`).then((res) => {
-    //       let empDepartmentName = getters.getDeparmentNameById(
-    //         res.data.DepartmentId
-    //       );
-    //       commit(SET_ONE_EMPLOYEE, {
-    //         ...res.data,
-    //         DepartmentName: empDepartmentName,
-    //       });
-    //       commit("copyEmployee", state.Employee);
-    //     });
-    //   } catch (error) {
-    //     console.log(error);
-    //   }
-    // },
     getEmployeeById({ commit, getters, state }, id) {
       try {
         axios.get(`${SECON_API.EMPLOYEE}/${id}`).then((res) => {
           let empDepartmentName = getters.getDeparmentNameById(
-            res.data.DepartmentId
+            res.data.DepartmentID
           );
           commit(SET_ONE_EMPLOYEE, {
             ...res.data,
@@ -360,47 +394,16 @@ export default createStore({
 
     /**
      * Sửa nhân viên theo id
+     * Author: DTANH(30/10/2022)
      */
-    // editEmployee({ commit, dispatch }, { id, data }) {
-    //   axios
-    //     .put(`${API.GET_ALL_EMPLOYEE}/${id}`, data)
-    //     .then((res) => {
-    //       if (res.status == 200) {
-    //         dispatch("reloadData");
-    //         commit(CLEAR_EMPLOYEE);
-    //         commit(STATUS_POPUP);
-    //         commit(SET_EDITFORM, false);
-    //         commit(SET_TOAST, {
-    //           show: true,
-    //           type: "success",
-    //           message: "Sửa thành công",
-    //         });
-    //         setTimeout(() => {
-    //           commit(SET_TOAST, {
-    //             show: false,
-    //             type: "success",
-    //             message: "Sửa thành công",
-    //           });
-    //         }, TIME_TO_SHOW_TOAST * 1000);
-    //       }
-    //     })
-    //     .catch((error) => {
-    //       console.log(error);
-    //       commit(SET_ERROR, {
-    //         errorCode: error.response.status,
-    //         errorMsg: error.response.data.userMsg,
-    //       });
-    //     });
-    // },
     editEmployee({ commit, dispatch }, { id, data }) {
       axios
-        .put(`${SECON_API.EMPLOYEE}/${id}`, {
+        .post(`${SECON_API.UPDATE_OR_INSERT_EMP}?recordID=${id}`, {
           ...data,
           ModifiedDate: new Date(),
           ModifiedBy: "Đinh Thế Anh",
         })
         .then((res) => {
-          debugger;
           if (res.status == 200) {
             dispatch("reloadData");
             commit(CLEAR_EMPLOYEE);
@@ -421,11 +424,10 @@ export default createStore({
           }
         })
         .catch((error) => {
-          debugger;
           console.log(error);
           commit(SET_ERROR, {
-            errorCode: error.response.status,
-            errorMsg: error.response.data.userMsg,
+            errorCode: error.response.data.ErrorCode,
+            errorMsg: error.response.data.UserMsg,
           });
         });
     },
@@ -433,14 +435,28 @@ export default createStore({
     /**
      * Thêm mới nhân viên
      */
-    addEmployee({ commit }, data) {
+    async addEmployee({ commit, dispatch }, { data ,closePopup = false}) {
       axios
-        .post(`${API.GET_ALL_EMPLOYEE}`, data)
-        .then((res) => {
+        .post(`${SECON_API.UPDATE_OR_INSERT_EMP}`, {
+          ...data,
+          JobPositionID: "6b47b37f-3123-3ce7-14cf-9712082ff6cb",
+          ModifiedDate: new Date(),
+          ModifiedBy: "Đinh Thế Anh",
+        })
+        .then(async (res) => {
           if (res.status === 201) {
-            commit(ADD_EMPLOYEE, data);
+            commit(ADD_EMPLOYEE, { ...data, EmployeeId: res.data });
+            if (closePopup) { 
+              commit(STATUS_POPUP);
+              commit(SET_MODIFIED_FORM, true);
+            }
             commit(SET_MODIFIED_FORM, false);
             commit(SET_EDITFORM, false);
+            let newCode = await dispatch("getNewEmployeeCod");
+            commit(SET_ONE_EMPLOYEE, {
+              ...DEFAULT_GENDER,
+              EmployeeCode: newCode,
+            });
             commit(SET_TOAST, {
               show: true,
               type: "success",
@@ -453,13 +469,15 @@ export default createStore({
                 message: "Sửa thành công",
               });
             }, 2500);
+            return true;
           }
+          return false;
         })
         .catch((error) => {
           console.log(error);
           commit(SET_ERROR, {
             errorCode: error.response.status,
-            errorMsg: error.response.data.userMsg,
+            errorMsg: error.response.data.UserMsg,
           });
         });
     },
@@ -468,9 +486,6 @@ export default createStore({
      * Reload data
      */
     reloadData({ getters, dispatch }) {
-      // commit("setPageNumber", DEFAULT_PAGE_NUMBER);
-      // commit("setPageSize", DEFAULT_PAGE_SIZE);
-      // commit("setSearchKeyword", null);
       dispatch("filterEmployee", {
         pageSize: getters["pageSize"],
         pageNumber: getters["pageNumber"],
@@ -479,43 +494,92 @@ export default createStore({
     /**
      * Xóa bản ghi
      */
-    // deleteEmployee({ commit, dispatch }, id) {
-    //   axios.delete(`${API.GET_ALL_EMPLOYEE}/${id}`).then((res) => {
-    //     if (res.status === 200) {
-    //       dispatch("reloadData");
-    //       commit(SET_TOAST, {
-    //         show: true,
-    //         type: "success",
-    //         message: "Xóa thành công",
-    //       });
-    //       setTimeout(() => {
-    //         commit(SET_TOAST, {
-    //           show: false,
-    //           type: "success",
-    //           message: "Xóa thành công",
-    //         });
-    //       }, TIME_TO_SHOW_TOAST * 1000);
-    //     }
-    //   })
-    // }
-    deleteEmployee({ commit, dispatch }, id) {
-      axios.delete(`${SECON_API.EMPLOYEE}/${id}`).then((res) => {
-        if (res.status === 200) {
-          dispatch("reloadData");
-          commit(SET_TOAST, {
-            show: true,
-            type: "success",
-            message: "Xóa thành công",
-          });
-          setTimeout(() => {
+    deleteEmployee({ commit, dispatch, getters }, id) {
+      axios
+        .delete(`${SECON_API.EMPLOYEE}/${id}`)
+        .then((res) => {
+          if (res.status === 200) {
+            commit(SET_CHECK_ALL, false);
+            commit(SET_LIST_DELETE_EMP, []);
+            if (getters["getListEmployee"].length == 1) {
+              if (getters["pageNumber"] > 1) {
+                commit(CHANGE_PAGE_NUMBER, getters["pageNumber"] - 1);
+              }
+            }
+            dispatch("reloadData");
             commit(SET_TOAST, {
-              show: false,
+              show: true,
               type: "success",
               message: "Xóa thành công",
             });
-          }, TIME_TO_SHOW_TOAST * 1000);
-        }
-      });
+            setTimeout(() => {
+              commit(SET_TOAST, {
+                show: false,
+                type: "success",
+                message: "Xóa thành công",
+              });
+            }, TIME_TO_SHOW_TOAST * 1000);
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
+
+    /**
+     * lấy mã nhân viên mới
+     */
+    async getNewEmployeeCod({ commit }) {
+      try {
+        let res = await axios.get(SECON_API.GET_NEWCODE_EMP);
+        commit(SET_NEW_CODE, res.data);
+        return res.data;
+      } catch (error) {
+        console.log(error);
+      }
+    },
+
+    /**
+     * xóa nhiều nhân viên
+     */
+    deleteMultiEmployee({ commit, dispatch, getters }, ids) {
+      axios
+        .post(`${SECON_API.BATCH_DELETE_EMP}`, { EmployeeIDs: ids })
+        .then(() => {
+          commit(SET_CHECK_ALL, false);
+          commit(SET_LIST_DELETE_EMP, []);
+          if (getters["getListEmployee"].length == ids.length) {
+            if (getters["pageNumber"] > 1) {
+              commit(CHANGE_PAGE_NUMBER, getters["pageNumber"] - 1);
+            }
+          }
+          dispatch("reloadData");
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
+
+    /**
+     * Xuất khẩu file excel
+     */
+    exportExcel() {
+      axios
+        .post(`${SECON_API.EMPLOYEE}/ExportExcel`)
+        .then((res) => {
+          res.config.responseType = "blob";
+          axios(res.config).then((res) => {
+            const url = window.URL.createObjectURL(new Blob([res.data]));
+            const link = document.createElement("a");
+            link.href = url;
+            link.setAttribute("download", "file.xlsx");
+            document.body.appendChild(link);
+            link.click();
+          });
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     },
   },
 
@@ -536,6 +600,12 @@ export default createStore({
       console.log(state.listDepartment.find((item) => item.DepartmentId == id));
       return state.listDepartment.find((item) => item.DepartmentId == id)
         .DepartmentName;
+    },
+    getListEmployee: (state) => {
+      return state.listEmployee;
+    },
+    getNewEmployeeCode: (state) => {
+      return state.newEmployeeCode;
     },
   },
 });

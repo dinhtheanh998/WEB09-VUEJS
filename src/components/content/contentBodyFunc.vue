@@ -1,31 +1,61 @@
 <template lang="">
   <div class="body__search__reload">
-    <button
+    <!-- <button
       class="delete__multiply"
       v-show="listDeleteIdEmployee.length > 0"
       @click="onClickDeleteMulti"
     >
       <i class="icofont-delete-alt"></i>
-    </button>
-    <div class="wrap-input">
-      <div class="wrap__input--icon">
-        <input
-          type="text"
-          class="input__search"
-          placeholder="Tìm theo mã, tên nhân viên"
-          @input="searchDebounce"
-        />
-        <div class="search__icon"></div>
+    </button> -->
+    <div>
+      <div
+        class="select_count flex align-center gap-x-16"
+        v-if="listDeleteIdEmployee.length"
+      >
+        <span class="select_count--text"
+          >{{Text.selected}}
+          <span class="count--text--number">{{
+            listDeleteIdEmployee.length
+          }}</span>
+        </span>
+        <span class="clear__select" @click="clickCheckAll">{{Text.removeSelected}}</span>
+        <div>
+          <MyButtonIcon :btnText="Text.delete" isSecondary @click="onClickDeleteMulti"
+            ><i class="icofont-close-circled"></i
+          ></MyButtonIcon>
+        </div>
       </div>
-      <!-- <inputIcon placeholder="Tìm theo mã tên nhân viên"></inputIcon> -->
     </div>
-    <div class="reload__icon" title="Làm mới dữ liệu" @click="reloadData"></div>
+    <div class="flex align-center gap-x-16">
+      <div class="wrap-input">
+        <div class="wrap__input--icon">
+          <input
+            type="text"
+            class="input__search"
+            placeholder="Tìm theo mã, tên nhân viên"
+            @input="searchDebounce"
+          />
+          <div class="search__icon"></div>
+        </div>
+        <!-- <inputIcon placeholder="Tìm theo mã tên nhân viên"></inputIcon> -->
+      </div>
+      <div class="excel_export" @click="exportExcel" :title="Tooltip.exportExcel">
+        
+      </div>
+      <div
+        class="reload__icon"
+        title="Làm mới dữ liệu"
+        @click="reloadData"
+      ></div>
+    </div>
   </div>
   <teleport to="body">
     <warningDialogVue
       v-if="showDialogDel.isShow"
       :description="
-        'Bạn có chắc chắn muốn xóa ' + listDeleteIdEmployee.length + ' nhân viên không?'
+        'Bạn có chắc chắn muốn xóa ' +
+        listDeleteIdEmployee.length +
+        ' nhân viên không?'
       "
       :handleDeleteFalse="handleDeleteFalse"
       :handleDeleteTrue="handleDeleteTrue"
@@ -36,11 +66,12 @@
 </template>
 <script>
 import warningDialogVue from "../dialog/WarningDialog.vue";
+import MyButtonIcon from "../Button/MyButtonIcon.vue";
 import _ from "lodash";
 // import inputIcon from "../Input/inputWithIcon.vue";
-import axios from "axios";
 import { mapActions, mapState } from "vuex";
-import { SEARCH_KEYWORD } from "@/store/Mutatios.Type";
+import { SEARCH_KEYWORD, SET_CHECK_ALL, SET_LIST_DELETE_EMP } from "@/store/Mutatios.Type";
+import  {TEXT,TOOLTIP} from "../../resource/ResourceVN"
 export default {
   data() {
     return {
@@ -49,20 +80,36 @@ export default {
         isShow: false,
         data: [],
       },
+      Text: TEXT,
+      Tooltip:TOOLTIP
     };
   },
   components: {
     // inputIcon,
     warningDialogVue,
+    MyButtonIcon,
   },
   computed: {
-    ...mapState(["listDeleteIdEmployee"])
+    ...mapState(["listDeleteIdEmployee", "listEmployee","isCheckAll"]),
   },
   methods: {
     ...mapActions(["reloadData"]),
-    
+    /**
+     * bỏ check toàn bộ bản ghi trong trang
+     * Author : DTANH (25/10/2022)
+     */
+    clickCheckAll() {
+      
+      this.listEmployee.forEach((item) => {
+        item.isChecked = false;
+        this.$store.commit(SET_CHECK_ALL, false);
+        this.$store.commit(SET_LIST_DELETE_EMP, []);
+      });
+    },
+
     /**
      * @description: Hàm xử lý khi click vào nút xóa nhiều nhân viên
+     * Author : DTANH (25/10/2022)
      */
     onClickDeleteMulti() {
       this.showDialogDel.isShow = true;
@@ -76,30 +123,22 @@ export default {
       this.showDialogDel.isShow = false;
     },
 
-    /** 
+    /**
      * Chọn xác nhận xóa nhiều bản ghi trong dialog
-    */
-    handleDeleteTrue() {
-      this.showDialogDel.data.forEach((item) => {
-        axios
-          .delete(`https://amis.manhnv.net/api/v1/Employees/${item}`)
-          .then((res) => {
-            console.log(res);
-          })
-          .catch((err) => {
-            console.log(err);
-          });
-      });
+     * Author : DTANH (25/10/2022)
+     */
+    handleDeleteTrue() {      
+      this.$store.dispatch("deleteMultiEmployee", this.showDialogDel.data);
+      this.showDialogDel.data = [];
       this.showDialogDel.isShow = false;
     },
 
-    /** 
+    /**
      * Xử lý tìm kiếm theo từ khóa nếu có giá trị trong ô input hoặc không có giá trị
-     * Author:DTANh (30/10/2022)     
-    */
+     * Author:DTANh (30/10/2022)
+     */
     handleSearchEmployee(e) {
       if (e.target.value.length > 0) {
-        console.log(e.target.value);
         this.$store.dispatch("filterEmployee", {
           pageSize: this.$store.state.pageSize,
           pageNumber: this.$store.state.pageNumber,
@@ -131,16 +170,45 @@ export default {
     /**
      * Gọi hàm debounce
      * Author:DTANh (30/10/2022)
-    */
+     */
     searchDebounce: _.debounce(function (e) {
       console.log(e.target.value);
-      this.$store.commit(SEARCH_KEYWORD, e.target.value);      
+      this.$store.commit(SEARCH_KEYWORD, e.target.value);
       this.handleSearchEmployee(e);
     }, 500),
-    ...mapActions(["searchEmployee", "filterEmployee"]),
+
+    /**
+     * xuất khẩu dữ liệu ra file excel
+     * Author : DTANH (20/11/2022)
+     */
+    exportExcel() {
+      this.$store.dispatch("exportExcel");
+    },
+    ...mapActions(["searchEmployee", "filterEmployee","exportExcel"]),
   },
 };
 </script>
 <style lang="css" scoped>
 @import url("../../css/component/content-nav-function.css");
+.select_count {
+  color: var(--text-color);
+  font-size: 14px;
+}
+.count--text--number {
+  font-weight: 700;
+}
+.clear__select {
+  color: var(--error-color);
+  cursor: pointer;
+}
+.excel_export {
+  width: 24px;
+  height: 24px;
+  background-image: url("../../assets/images/Sprites.64af8f61.svg");
+  background-position: -705px -199px;
+  cursor: pointer;
+}
+.excel_export:hover {
+  background-position: -705px -255px;
+}
 </style>

@@ -117,6 +117,8 @@ export default {
 };
 </script>
 <style lang="css">
+
+
 .table__body td {
   height: 48px;
   /* line-height: 48px; */
@@ -168,6 +170,11 @@ td.lastcol {
 .table__body td:first-child:hover .custom__checkbox {
   background-color: #fff;
 }
+
+.table__body:last-child, .table__body:last-child td   {
+  border-bottom: unset;
+}
+
 .table__body:hover > td {
   background-color: var(--hover-color);
 }

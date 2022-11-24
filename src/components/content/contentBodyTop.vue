@@ -1,14 +1,13 @@
 <template lang="">
   <div class="wrap__top__body">
-    <h2 class="body__header__title">Nhân Viên</h2>
+    <h2 class="body__header__title">{{Text.employee}}</h2>
     <myButton
-      btnText="Thêm mới nhân viên"
+      :btnText="Text.addEmployee"
       isPrimary
       @click="handleShowPopup"
     ></myButton>
     <Teleport to="body">
       <myPopup v-if="showPopup"></myPopup>
-      <!-- <myPopup v-show="showPopup" :infoEmployee="Employee"></myPopup> -->
     </Teleport>
   </div>
 </template>
@@ -17,7 +16,8 @@ import { CLEAR_EMPLOYEE, SET_ONE_EMPLOYEE, SET_TITLE_POPUP, STATUS_POPUP } from 
 import { mapState } from "vuex";
 import myButton from "../Button/MyButtonPrimary.vue";
 import myPopup from "../popup/MyPopup.vue";
-import { DEFAULT_GENDER } from '@/config/Constraint';
+import { DEFAULT_GENDER } from '@/config/Common';
+import {TEXT} from "../../resource/ResourceVN"
 export default {
   components: {
     myButton,
@@ -28,19 +28,20 @@ export default {
       // showPopup: false,
       refeshData: Function,
       recordPerPage: 10,
+      Text : TEXT
     };
   },
   computed: {
-    ...mapState(["Employee", "showPopup"]),
+    ...mapState(["Employee", "showPopup","newEmployeeCode"]),
   },
   methods: {
     /**
      * Hàm hiển thị popup và thay đổi title của popup
      * Author : DTANH (30/10/2022)
      */
-    handleShowPopup() {
+    handleShowPopup() {      
       this.$store.commit(CLEAR_EMPLOYEE);
-      this.$store.commit(SET_ONE_EMPLOYEE, DEFAULT_GENDER)
+      this.$store.commit(SET_ONE_EMPLOYEE, { ...DEFAULT_GENDER, EmployeeCode: this.newEmployeeCode });
       this.$store.commit(SET_TITLE_POPUP, "Thêm mới nhân viên");
       this.$store.commit(STATUS_POPUP);
     },
@@ -61,6 +62,7 @@ export default {
     this.eventBus.on("recordPerPage", (data) => {
       this.recordPerPage = data;
     });
+    this.$store.dispatch("getNewEmployeeCod");
   },
   mounted() {
     document.addEventListener("keydown", (e) => {
@@ -68,6 +70,7 @@ export default {
         this.handleShowPopup();
       }
     });
+    this.$store.dispatch("getNewEmployeeCod");
   },
   unmounted() {
     document.removeEventListener("keydown", (e) => {
@@ -86,9 +89,8 @@ export default {
   margin-bottom: 16px;
 }
 .body__header__title {
-  font-size: 20px;
+  font-size: 24px;
   line-height: 26px;
-  text-transform: uppercase;
   color: var(--text-color);
   font-weight: 700;
 }

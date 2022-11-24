@@ -13,7 +13,9 @@
   <div style="margin:32px 0"></div>
   <PaggingVue :totalPage="6" :numberPageDisplay="2"></PaggingVue>  
   <button @click="showToast">Show toast</button> -->
-  <ToastTiFiVue></ToastTiFiVue>
+  <!-- <ToastTiFiVue></ToastTiFiVue> -->
+  <FilterConditionVue :typeFilter="4" ></FilterConditionVue>
+  <ToastTiFiMISA></ToastTiFiMISA>
 </template>
 
 <script>
@@ -21,7 +23,9 @@ import layoutSibar from "./layout/LayoutSibar.vue";
 import layoutHeader from "./layout/LayoutHeader.vue";
 // import TestComponentVue from "./components/TestComponent.vue";
 // import PaggingVue from "./components/pagging/Pagging.vue";
-import ToastTiFiVue from "./components/toastifi/ToastTiFi.vue";
+// import ToastTiFiVue from "./components/toastifi/ToastTiFi.vue";
+import ToastTiFiMISA from "./components/toastifi/ToastTiFiMISA.vue";
+import FilterConditionVue from "./components/dialog/FilterCondition.vue";
 import { mapState } from 'vuex';
 import { SET_TOAST } from "./store/Mutatios.Type";
 // import layoutContent from "./layout/layoutContent.vue";
@@ -41,7 +45,9 @@ export default {
     layoutHeader,
     // TestComponentVue,
     // PaggingVue,
-    ToastTiFiVue,
+    // ToastTiFiVue,
+    FilterConditionVue,
+    ToastTiFiMISA,
     // layoutContent,
     // myCheckbox
     // myDropdown,
@@ -49,12 +55,14 @@ export default {
   },
   methods: {
     mounted() {
-      console.log(this);
-      this.emitter.$on('toggleSidebar', (data) => {
-        console.log(data);
+      this.emitter.$on('toggleSidebar', () => {
         // this.isOpen = !this.isOpen;
       })
     },
+    /**
+     * Hiển thị toast
+     * Author: DTANH(25/10/2022)
+     */
     showToast() {
       this.$store.commit(SET_TOAST, {
         show: true,

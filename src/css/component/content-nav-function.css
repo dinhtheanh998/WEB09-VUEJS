@@ -1,9 +1,10 @@
 .body__search__reload {
-    padding: 12px 24px 16px 0;
+    padding: 12px 24px 16px 12px;
     display: flex;
     align-items: center;
-    justify-content: flex-end;
+    justify-content: space-between;
     gap: 0 16px;
+    height: 64px;
   }
   .reload__icon {
     width: 24px;
@@ -27,7 +28,7 @@
     color: #fff;
   }
   .wrap__input--icon {
-    height: 32px;
+    height: 36px;
     max-width: 300px;
     position: relative;
     display: flex;
@@ -45,6 +46,8 @@
     padding-right: 33px;
     padding-left: 12px;
     border-radius: 4px;
+    padding-top: 0px;
+    padding-bottom: 0px;
   }
   .input__search::placeholder {
     font-style: italic;

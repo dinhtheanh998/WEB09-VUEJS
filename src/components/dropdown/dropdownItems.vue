@@ -1,5 +1,5 @@
 <template lang="">
-  <div class="dropdown__item" @click="doFunc" :data-value="dataValue" :class="{active: pageSize == dataValue || dataValue == Employee.DepartmentId}">
+  <div class="dropdown__item" @click="doFunc" :data-value="dataValue" :class="{active: pageSize == dataValue || dataValue == Employee.DepartmentID}">
     {{ item.text || item.DepartmentName }}
   </div>
 </template>
@@ -34,7 +34,6 @@ export default {
       this.selectedValue(this.item.text || this.item.DepartmentName);
       this.closeDropdown();
       if (this.item.value) {
-        console.log(this.pageNumber)
         let newTotalRecord = this.pageNumber * Number(this.item.value);
         
         if(newTotalRecord > this.totalRecord){
@@ -50,6 +49,10 @@ export default {
         deparmentID: this.item.DepartmentId,
       }}
       );
+      this.$store.commit("setErrorValid", {
+            ...this.$store.state.errorValid,
+            DepartmentID: null,
+          });
     },
   },
   computed: {

@@ -1,12 +1,12 @@
 <template lang="">
   <div class="pagging">
-    <!-- <button class="pagging__btn" @click="selectPage($event, 1)" :class="{disable: pageNumber==1 }">
+    <button class="pagging__btn" @click="selectPage($event, 1)" :class="{disable: pageNumber==1 }">
       <i class="icofont-rounded-double-left"></i>
-    </button> -->
-    <!-- <button class="pagging__btn" @click="prevPage" :class="{disable: pageNumber==1 }">
+    </button>
+    <button class="pagging__btn" @click="prevPage" :class="{disable: pageNumber==1 }">
       <i class="icofont-rounded-left"></i>
-    </button> -->
-    <div :class="{disable: pageNumber==1 }" @click="prevPage" class="paggingText">Trước</div>
+    </button>
+    <!-- <div :class="{disable: pageNumber==1 }" @click="prevPage" class="paggingText">Trước</div> -->
     <button
       class="pagging__btn"
       v-show="pageNumber != 1"
@@ -41,15 +41,15 @@
     >
       {{ totalPage }}
     </button>
-    <!-- <button class="pagging__btn">
+    <button class="pagging__btn">
       <i class="icofont-rounded-right" @click="nextPage" :class="{disable: pageNumber==totalPage }"></i>
-    </button> -->
-    <div :class="{disable: pageNumber==totalPage }" @click="nextPage" class="paggingText">
+    </button>
+    <!-- <div :class="{disable: pageNumber==totalPage }" @click="nextPage" class="paggingText">
       Sau
-    </div>
-    <!-- <button class="pagging__btn" @click="selectPage($event, totalPage)" :class="{disable: pageNumber==totalPage }">
+    </div> -->
+    <button class="pagging__btn" @click="selectPage($event, totalPage)" :class="{disable: pageNumber==totalPage }">
       <i class="icofont-rounded-double-right"></i>
-    </button> -->
+    </button>
     <div class="pagging__gotoPage" v-show="showGoToPage" id="goToPage">
       <div class="pagging__gotoPage--title">Chọn trang bạn muốn tới</div>
       <div class="pagging__gotoPage-input">

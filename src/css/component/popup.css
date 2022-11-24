@@ -13,10 +13,10 @@
     z-index: 10;
   }
   .form__employee {
-    width: 1000px;
+    width: 900px;
     background-color: #fff;
     margin: auto;
-    padding: 24px 24px 12px 24px;
+    padding: 24px;
     position: relative;
     z-index: 99;
     animation: grow 0.4s ease-in-out;
@@ -55,11 +55,11 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding-top: 16px;
+    padding-top: 24px;
   }
   .wrap__textfield {
     gap: 8px 0;
-    margin-bottom: 3px;
+    margin-bottom: 2px;
   }
   .wrap__textfield > label {
     font-size: 13px;
@@ -72,7 +72,7 @@
     visibility: hidden;
     font-size: 12px;
     color: var(--error-color);
-    height: 13px;
+    height: 14px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -84,7 +84,10 @@
   }
   
   .input__custom {
-    border-color: #bdbdbd;
+    border-color: var(--border-color);
+  }
+  .input__custom:hover {
+    background-color: #f6f6f6;
   }
   .field__required::after {
     content: "*";
@@ -120,7 +123,7 @@
     width: 10px;
     height: 10px;
     border-radius: 50%;
-    box-shadow: 0 0 0 2px #fff, 0 0 0 3px #bdbdbd;
+    box-shadow: 0 0 0 2px #fff, 0 0 0 3px var(--border-color);
   }
   
   .custom-radio input:checked + div {
@@ -136,7 +139,7 @@
     width: 16px;
     height: 16px;
     background: #fff;
-    border: 1px solid #666666;
+    border: 1px solid var(--border-color);
   }
   
   .custom-checkbox input:checked + div.custom-checkbox-wrap {

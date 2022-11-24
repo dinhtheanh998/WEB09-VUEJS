@@ -1,5 +1,5 @@
 <template lang="">
-  <div v-if="showPopup" class="pop__up">
+  <div v-if="showPopup" class="pop__up" @keydown="handleKeyPressPopup">
     <div class="popup__overlay" @click="handleShowPopup"></div>
     <form action="" class="form__employee" @submit="submitForm">
       <div class="employee__top flex">
@@ -13,7 +13,7 @@
               <input type="checkbox" id="isCustomer" hidden />
               <div class="custom-checkbox-wrap"></div>
             </label>
-            <label for="isCustomer">Là khách hàng</label>
+            <label for="isCustomer">{{Text.isCustomer}}</label>
           </div>
           <div class="flex align-center">
             <label
@@ -23,7 +23,7 @@
               <input type="checkbox" id="isSuplier" hidden />
               <div class="custom-checkbox-wrap"></div>
             </label>
-            <label for="isSuplier">Là nhà cung cấp</label>
+            <label for="isSuplier">{{Text.isSuplier}}</label>
           </div>
         </div>
       </div>
@@ -31,7 +31,7 @@
         <div class="flex gap-x-16">
           <div class="left__details">
             <inputLabelAndError
-              label="Mã nhân viên"
+              :label="FieldName.employeeCode"
               name="EmployeeCode"
               placeholderText="MNV01"
               tabIndex="1"
@@ -44,7 +44,7 @@
               :autoforcus="true"
             ></inputLabelAndError>
             <inputLabelAndError
-              label="Tên nhân viên"
+              :label="FieldName.employeeName"
               name="EmployeeName"
               tabIndex="2"
               placeholderText="Nguyễn Văn A"
@@ -62,18 +62,17 @@
                 moveToBot
                 @returnDepartments="returnValue"
                 :defaultValue="Employee.DepartmentName || 'Chọn đơn vị'"
-                :isValidate="error?.DepartmentId"
-                @click="clickDepartment"
+                :tabIndex="3"
+                :errorMesage="error.DepartmentID"
               ></myDropdown>
               <span
                 class="input__text-error"
-                :class="{ show: error.DepartmentId }"
-                >{{ error.DepartmentId }}</span
-              >
+                :class="{ show: error.DepartmentID }"
+              ></span>
             </div>
             <inputLabelAndError
-              label="Chức danh"
-              name="Position"
+              :label="FieldName.position"
+              name="JobPositionName"
               placeholderText="Trưởng phòng kinh doanh"
               tabIndex="4"
               classProps="flex-col w-full wrap__textfield"
@@ -82,26 +81,26 @@
           </div>
           <div class="right__details">
             <inputLabelAndError
-              label="Ngày sinh"
-              name="DateOfBirth"
+              :label="FieldName.dateOfBirth"
+              name="DateofBirth"
               tabIndex="5"
               classProps="flex-col w-40 wrap__textfield"
               typeInput="date"
               @returnValue="returnValue"
-              :error="error.DayOfBirth"
+              :error="error.DateofBirth"
               :valueInput="
-                Employee.DateOfBirth
-                  ? String(Employee.DateOfBirth).slice(0, 10)
+                Employee.DateofBirth
+                  ? String(Employee.DateofBirth).slice(0, 10)
                   : ''
               "
             ></inputLabelAndError>
             <div class="flex-col wrap__gender wrap__textfield">
               <label for="">Giới tính</label>
-              <div class="flex gap-x-16 gender">
-                <div class="flex gap-x-8 align-center">
+              <div class="flex gap-x-20 gender">
+                <div class="flex gap-x-12 align-center" @keydown.enter="chosseGenderByKeydown(GENDER.MALE,'Nam')">
                   <label
                     for="men"
-                    class="flex align-center gap-x-8 custom-radio"
+                    class="flex align-center gap-x-12 custom-radio"
                     tabindex="6"
                   >
                     <input
@@ -118,7 +117,7 @@
                   </label>
                   <label for="men">Nam</label>
                 </div>
-                <div class="flex gap-x-8 align-center">
+                <div class="flex gap-x-12 align-center" @keydown.enter="chosseGenderByKeydown(GENDER.FEMALE,'Nữ')">
                   <label
                     for="women"
                     class="flex align-center gap-x-8 custom-radio"
@@ -138,7 +137,7 @@
                   </label>
                   <label for="women">Nữ</label>
                 </div>
-                <div class="flex gap-x-8 align-center">
+                <div class="flex gap-x-12 align-center" @keydown.enter="chosseGenderByKeydown(GENDER.OTHER,'Khác')">
                   <label
                     for="other"
                     class="flex align-center gap-x-8 custom-radio"
@@ -161,7 +160,7 @@
               </div>
             </div>
             <inputLabelAndError
-              label="Số CMND"
+              :label="FieldName.identityNumber"
               name="IdentityNumber"
               tabIndex="6"
               placeholderText="125816832"
@@ -169,13 +168,14 @@
               @returnValue="returnValue"
               :valueInput="Employee.IdentityNumber"
               :error="error.IdentityNumber"
+              title="Số Chứng minh nhân dân"
             ></inputLabelAndError>
             <inputLabelAndError
-              label="Ngày cấp"
+              :label="FieldName.indentityDate"
               name="IdentityDate"
               tabIndex="7"
               typeInput="date"
-              classProps="flex-col grow-1 wrap__textfield"
+              classProps="flex-col w-40 wrap__textfield"
               :valueInput="
                 Employee.IdentityDate
                   ? String(Employee.IdentityDate).slice(0, 10)
@@ -184,7 +184,7 @@
               @returnValue="returnValue"
             ></inputLabelAndError>
             <inputLabelAndError
-              label="Nơi cấp"
+            :label="FieldName.indentityPlace"
               name="IdentityPlace"
               tabIndex="8"
               placeholderText="Bắc Ninh"
@@ -195,17 +195,17 @@
           </div>
         </div>
         <inputLabelAndError
-          label="Địa chỉ"
-          name="Address"
+          :label="FieldName.address"
+          name="Adress"
           tabIndex="9"
           classProps="flex-col w-full wrap__textfield"
-          :valueInput="Employee.Address"
+          :valueInput="Employee.Adress"
           @returnValue="returnValue"
         ></inputLabelAndError>
         <div class="flex gap-x-8">
           <div class="flex align-center w-full gap-x-8">
             <inputLabelAndError
-              label="ĐT di động"
+              :label="FieldName.telePhoneNumber"
               name="TelephoneNumber"
               placeholderText="0987654321"
               tabIndex="10"
@@ -213,9 +213,10 @@
               :valueInput="Employee.TelephoneNumber"
               @returnValue="returnValue"
               :error="error.TelephoneNumber"
+              title="Điện thoại di động"
             ></inputLabelAndError>
             <inputLabelAndError
-              label="ĐT cố định"
+            :label="FieldName.phoneNumber"
               name="PhoneNumber"
               placeholderText="0241234567"
               tabIndex="11"
@@ -223,11 +224,12 @@
               :valueInput="Employee.PhoneNumber"
               @returnValue="returnValue"
               :error="error.PhoneNumber"
+              title="Điện thoại cố định"
             ></inputLabelAndError>
           </div>
           <div class="flex align-center w-full gap-x-8">
             <inputLabelAndError
-              label="Email"
+            :label="FieldName.email"
               name="Email"
               placeholderText="company@example.com"
               tabIndex="12"
@@ -242,12 +244,12 @@
           <div class="flex align-center w-full gap-x-8">
             <inputLabelAndError
               label="Tài khoản ngân hàng"
-              name="BankAccountNumber"
+              name="BankNumber"
               tabIndex="13"
               classProps="flex-col w-50 wrap__textfield"
-              :valueInput="Employee.BankAccountNumber"
+              :valueInput="Employee.BankNumber"
               @returnValue="returnValue"
-              :error="error.BankAccountNumber"
+              :error="error.BankNumber"
             ></inputLabelAndError>
             <inputLabelAndError
               label="Tên ngân hàng"
@@ -261,10 +263,10 @@
           <div class="flex align-center w-full gap-x-8">
             <inputLabelAndError
               label="Chi nhánh"
-              name="BankBranchName"
+              name="BankBranch"
               tabIndex="15"
               classProps="flex-col w-50 wrap__textfield"
-              :valueInput="Employee.BankBranchName"
+              :valueInput="Employee.BankBranch"
               @returnValue="returnValue"
             ></inputLabelAndError>
           </div>
@@ -272,22 +274,34 @@
       </div>
       <div class="employee__button">
         <myButton
-          btnText="Hủy"
+          :btnText="Text.cancel"
           isSecondary
           @click.prevent="handleShowPopup"
+          @blur="handleLoopFocus"
+          :tabIndex="18"
         ></myButton>
         <div class="flex align-center gap-x-12">
           <myButton
-            btnText="Cất"
+          :btnText="Text.save"
             isSecondary
             @click.prevent="handleSaveData"
+            :tabIndex="17"
           ></myButton>
-          <myButton btnText="Cất và thêm" isPrimary typeBtn="submit"></myButton>
+          <myButton
+          :btnText="Text.saveAndContinue"
+            isPrimary
+            typeBtn="submit"
+            :tabIndex="16"
+          ></myButton>
         </div>
       </div>
       <div class="flex align-item gap-x-16 wrap__question__close">
-        <div class="btn__question"></div>
-        <div class="btn__close" @click.prevent="handleShowPopup"></div>
+        <div class="btn__question" :title="Tooltip.info"></div>
+        <div
+          class="btn__close"
+          @click.prevent="handleShowPopup"
+          :title="Tooltip.close"
+        ></div>
       </div>
     </form>
     <Teleport to="body">
@@ -329,14 +343,13 @@ import {
   STATUS_POPUP,
 } from "@/store/Mutatios.Type";
 import {
-  MESSAGE_REQUIRED_EMPLOYEE_CODE,
-  MESSAGE_REQUIRED_EMPLOYEE_NAME,
-  MESSAGE_REQUIRED_PHONE_LENGTH,
-  MESSAGE_VALIDATE_CMND,
-  MESSAGE_VALIDATE_EMAIL,
-  MESSAGE_VALIDATE_PHONE_NUMBER,
+  MESSAGE_VALIDATE,
+  NAME_DISPLAY,
+  NAME_PROPERTIES,
   REGEX_NUMBER,
-} from "@/config/Constraint";
+} from "@/config/Common";
+import { KEY_CODES, GENDER } from "../../Enums/Enums";
+import { TEXT,FIELD_NAME,TOOLTIP } from "../../resource/ResourceVN"
 export default {
   components: {
     myButton,
@@ -348,17 +361,17 @@ export default {
   data: function () {
     return {
       error: {
-        EmployeeName: "",
-        EmployeeCode: "",
-        DateofBirth: "",
-        DepartmentId: "",
-        DepartmentName: "",
-        Department: "",
-        Email: "",
-        IdentityNumber: "",
-        TelephoneNumber: "",
-        PhoneNumber: "",
-        BankAccountNumber: "",
+        EmployeeName: null,
+        EmployeeCode: null,
+        DateofBirth: null,
+        DepartmentID: null,
+        DepartmentName: null,
+        Department: null,
+        Email: null,
+        IdentityNumber: null,
+        TelephoneNumber: null,
+        PhoneNumber: null,
+        BankNumber: null,
       },
       dialogData: {
         dialogShow: false,
@@ -369,103 +382,170 @@ export default {
         btnSecondaryChoseNo: "Không",
         handleChoseYes: "",
       },
+      GENDER: {},
+      Text: TEXT,
+      FieldName: FIELD_NAME,
+      Tooltip: TOOLTIP
     };
   },
 
   methods: {
-    clickDepartment() {
-      if (
-        !this.checkPropertyExist(this.Employee, "DepartmentId") ||
-        !this.Employee.DepartmentId
-      ) {
-        // this.$store.commit(SET_ONE_EMPLOYEE, {
-        //   ...this.$store.state.Employee,
-        //   DepartmentId: '',
-        // })
-        this.error.DepartmentId = "Vui lòng chọn phòng ban";
-      } else {
-        this.error.DepartmentId = "";
-      }
+
+    chosseGenderByKeydown(value,name) {
+      this.$store.commit(SET_ONE_EMPLOYEE, {
+          ...this.$store.state.Employee,
+          Gender: Number(value),
+          GenderName: name,
+        });
     },
 
+    /**
+     * Xử lý khi nhấn các phím tắt trên bàn phím
+     * Author : DTANH (22/11/2022)
+     */
+    handleKeyPressPopup(e) {
+      if (e.keyCode === KEY_CODES.ESC) {
+        this.handleShowPopup();
+      }
+      if (e.keyCode === KEY_CODES.CTRL_F8) {
+        this.handleSaveData();
+      }
+      if (e.keyCode === KEY_CODES.CTRL_F9) {
+        this.handleShowPopup();
+      }
+    },
+    /**
+     * xử lý khi tab đến nút Hủy
+     * Author : DTANH (22/11/2022)
+     */
+    handleLoopFocus() {
+      this.$refs.empCode.focus();
+    },
+    /**
+     * nếu chỉ click vào dropdown và chưa chọn đơn vị nào
+     * @param {bool} isValidate
+     */
+    /**
+     * Submit form     *
+     */
     submitForm(e) {
-      let isValid = true;
-      e.preventDefault();
+      try {
+        let isValid = true;
+        e.preventDefault();
+        this.validateBeforeSave();
+        this.error = {
+          EmployeeName: null,
+          EmployeeCode: null,
+          DateofBirth: null,
+          DepartmentID: null,
+          DepartmentName: null,
+          Department: null,
+          Email: null,
+          IdentityNumber: null,
+          TelephoneNumber: null,
+          PhoneNumber: null,
+          BankAccountNumber: null,
+        };
 
-      this.error = {
-        EmployeeName: "",
-        EmployeeCode: "",
-        DateofBirth: "",
-        DepartmentId: "",
-        DepartmentName: "",
-        Email: "",
-      };
-      console.log("Kiểm tra EmplpyeeName",this.checkPropertyExist(this.$store.state.Employee, "EmployeeName"))
-      if (!this.checkPropertyExist(this.$store.state.Employee, "EmployeeName")) {
-        this.$store.commit(SET_ONE_EMPLOYEE, {
-          ...this.$store.state.Employee,
-          EmployeeName: "",
-        })
+        if (
+          !this.checkPropertyExist(
+            this.$store.state.Employee,
+            NAME_PROPERTIES.EMPLOYEENAME
+          )
+        ) {
+          this.$store.commit(SET_ONE_EMPLOYEE, {
+            ...this.$store.state.Employee,
+            EmployeeName: null,
+          });
+        }
+        if (
+          !this.checkPropertyExist(this.$store.state.Employee, NAME_PROPERTIES.EMPLOYEECODE)
+        ) {
+          this.$store.commit(SET_ONE_EMPLOYEE, {
+            ...this.$store.state.Employee,
+            EmployeeCode: null,
+          });
+        }
+
+        isValid = this.validateForm();
+        if (isValid) {
+          this.handleAddData();
+        }
+      } catch (err) {
+        console.log(err);
       }
-      if(!this.checkPropertyExist(this.$store.state.Employee, "EmployeeCode") ) {
-        this.$store.commit(SET_ONE_EMPLOYEE, {
-          ...this.$store.state.Employee,
-          EmployeeCode: "",
-        })
-      }
-
-
-      isValid = this.validateForm();
-      if (isValid) {
-        this.handleAddData();
-        // this.$store.dispatch("addEmployee", this.$store.state.Employee);
-        // console.log(_.isEmpty(this.resError));
-      }
-
-      // call api
-      this.validateEmail(this.$store.state.Employee?.Email);
-      // axios.post("https://amis.manhnv.net/api/v1/Employees", this.$store.sate.Employee).then((res) => {
-      //   if(res.status === 201) {
-      //     this.$props.handlePopup();
-      //     this.reloadData();
-      //   }
-      //   console.log(res);
-      // }).catch((err) => {
-      //   console.log(err);
-      // });
-      // close popup
     },
-
+    /**
+     * Validate mã nhân viên kết thúc bằng số
+     */
     validateEmployeeCode(value) {
-      let regex = /^\D.*[0-9]$/;
-      return regex.test(value);
+      try {
+        let regex = /^\D.*[0-9]$/;
+        return regex.test(value);
+      } catch (err) {
+        console.log(err);
+      }
     },
 
     /**
      * Định dạng email
-     * @param {email} email 
+     * @param {email} email
      */
     validateEmail(email) {
-      let regex =
-        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-      return regex.test(email);
+      try {
+        let regex =
+          /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+        return regex.test(email);
+      } catch (err) {
+        console.log(err);
+      }
     },
 
     validateDayOfBirth(value) {
-      let result = new Date(value) - new Date();
-      return result <= 0;
+      try {
+        let result = new Date(value) - new Date();
+        console.log(
+          "date",
+          result <= 0 && Math.abs(result / 1000 / 60 / 60 / 24 / 365) < 200
+        );
+        return (
+          result <= 0 && Math.abs(result / 1000 / 60 / 60 / 24 / 365) < 200
+        );
+      } catch (err) {
+        console.log(err);
+      }
     },
 
+    /**
+     * Nhận emit từ dropdown gửi lên
+     * Author : DTANH (25/10/2022)
+     * @param {*} param0
+     */
     returnValue({ target, value }) {
-      /**
-       * Kiểm tra xem là form chỉnh sửa hay là form thêm mới
-       * Author : DTANH(01/11/2022)
-       */
-      if (this.$store.state.editForm) {
+      try {
+        if (value == "") value = null;
+        /**
+         * Kiểm tra xem là form chỉnh sửa hay là form thêm mới
+         * Author : DTANH(01/11/2022)
+         */
+        // if (this.$store.state.editForm) {
+        //   if (target == "department") {
+        //     this.$store.commit(SET_ONE_EMPLOYEE, {
+        //       ...this.$store.state.Employee,
+        //       DepartmentID: value.deparmentID,
+        //       DepartmentName: value.departmentName,
+        //     });
+        //   } else {
+        //     this.$store.commit(SET_ONE_EMPLOYEE, {
+        //       ...this.$store.state.Employee,
+        //       [target]: value,
+        //     });
+        //   }
+        // }
         if (target == "department") {
           this.$store.commit(SET_ONE_EMPLOYEE, {
             ...this.$store.state.Employee,
-            DepartmentId: value.deparmentID,
+            DepartmentID: value.deparmentID,
             DepartmentName: value.departmentName,
           });
         } else {
@@ -473,22 +553,11 @@ export default {
             ...this.$store.state.Employee,
             [target]: value,
           });
-          // this.$store.state.Employee[target] = value;
         }
+        this.validateForm();
+      } catch (err) {
+        console.log(err);
       }
-      if (target == "department") {
-        this.$store.commit(SET_ONE_EMPLOYEE, {
-          ...this.$store.state.Employee,
-          DepartmentId: value.deparmentID,
-          DepartmentName: value.departmentName,
-        });
-      } else {
-        this.$store.commit(SET_ONE_EMPLOYEE, {
-          ...this.$store.state.Employee,
-          [target]: value,
-        });
-      }
-      this.validateForm();
     },
 
     /**
@@ -498,30 +567,30 @@ export default {
     validateForm() {
       let result = true;
       if (!this.$store.state.Employee?.EmployeeCode) {
-        this.error.EmployeeCode = MESSAGE_REQUIRED_EMPLOYEE_CODE;
+        this.error.EmployeeCode =
+          MESSAGE_VALIDATE.MESSAGE_REQUIRED_EMPLOYEE_CODE;
         result = false;
       } else {
-        this.error.EmployeeCode = "";
+        this.error.EmployeeCode = null;
       }
-
       if (
         !this.$store.state.Employee?.EmployeeName &&
-        this.checkPropertyExist(this.$store.state.Employee, "EmployeeName")
+        this.checkPropertyExist(this.$store.state.Employee, NAME_PROPERTIES.EMPLOYEENAME)
       ) {
-        this.error.EmployeeName = MESSAGE_REQUIRED_EMPLOYEE_NAME;
+        this.error.EmployeeName = MESSAGE_VALIDATE.MESSAGE_REQUIRED_EMPLOYEE_NAME;
         result = false;
       } else {
-        this.error.EmployeeName = "";
+        this.error.EmployeeName = null;
       }
       if (
         this.$store.state.Employee?.Email &&
         !this.validateEmail(this.$store.state.Employee?.Email) &&
-        this.checkPropertyExist(this.$store.state.Employee, "Email")
+        this.checkPropertyExist(this.$store.state.Employee, NAME_PROPERTIES.EMAIL)
       ) {
-        this.error.Email = MESSAGE_VALIDATE_EMAIL;
+        this.error.Email = MESSAGE_VALIDATE.MESSAGE_VALIDATE_EMAIL;
         result = false;
       } else {
-        this.error.Email = "";
+        this.error.Email = null;
       }
       if (
         this.$store.state.Employee?.IdentityNumber &&
@@ -529,10 +598,10 @@ export default {
           this.$store.state.Employee?.IdentityNumber
         )
       ) {
-        this.error.IdentityNumber = MESSAGE_VALIDATE_CMND;
+        this.error.IdentityNumber = MESSAGE_VALIDATE.MESSAGE_VALIDATE_CMND;
         result = false;
       } else {
-        this.error.IdentityNumber = "";
+        this.error.IdentityNumber = null;
       }
       if (
         this.$store.state.Employee?.TelephoneNumber &&
@@ -540,50 +609,64 @@ export default {
           this.$store.state.Employee?.TelephoneNumber
         )
       ) {
-        this.error.TelephoneNumber = MESSAGE_VALIDATE_PHONE_NUMBER;
+        this.error.TelephoneNumber =
+          MESSAGE_VALIDATE.MESSAGE_VALIDATE_PHONE_NUMBER;
         result = false;
       } else if (
         !this.checkLength(this.$store.state.Employee?.TelephoneNumber, 10)
       ) {
-        this.error.TelephoneNumber = MESSAGE_REQUIRED_PHONE_LENGTH;
+        this.error.TelephoneNumber =
+          MESSAGE_VALIDATE.MESSAGE_REQUIRED_PHONE_LENGTH(10);
         result = false;
       } else {
-        this.error.TelephoneNumber = "";
+        this.error.TelephoneNumber = null;
       }
       if (
         this.$store.state.Employee?.PhoneNumber &&
         !this.checkValueWithRegexNumber(this.$store.state.Employee?.PhoneNumber)
       ) {
-        this.error.PhoneNumber = MESSAGE_VALIDATE_PHONE_NUMBER;
+        this.error.PhoneNumber = MESSAGE_VALIDATE.MESSAGE_VALIDATE_PHONE_NUMBER;
         result = false;
       } else if (
         !this.checkLength(this.$store.state.Employee?.PhoneNumber, 11)
       ) {
-        this.error.PhoneNumber = "Điên thoại cố định tối đa 11 số";
+        this.error.PhoneNumber =
+          MESSAGE_VALIDATE.MESSAGE_REQUIRED_PHONE_LENGTH(11);
         result = false;
       } else {
-        this.error.PhoneNumber = "";
+        this.error.PhoneNumber = null;
       }
       if (
-        this.$store.state.Employee?.BankAccountNumber &&
-        !this.checkValueWithRegexNumber(
-          this.$store.state.Employee?.BankAccountNumber
-        )
+        this.$store.state.Employee?.BankNumber &&
+        !this.checkValueWithRegexNumber(this.$store.state.Employee?.BankNumber)
       ) {
-        this.error.BankAccountNumber = "Số tài khoản phải là số";
+        this.error.BankNumber =
+          MESSAGE_VALIDATE.MESSAGE_ONLYNUMBER(NAME_DISPLAY.BANKNUMBER);
         result = false;
       } else {
-        this.error.BankAccountNumber = "";
+        this.error.BankNumber = null;
       }
       if (
-        !this.$store.state.Employee?.DepartmentId &&
-        this.checkPropertyExist(this.$store.state.Employee, "DepartmentId")
+        !this.$store.state.Employee?.DepartmentID &&
+        this.checkPropertyExist(this.$store.state.Employee, NAME_PROPERTIES.DEPARTMENTID)
       ) {
-        this.error.DepartmentId = "Hãy chọn ít nhất 1 đơn vị";
+        this.error.DepartmentID = MESSAGE_VALIDATE.MESSAGE_REQUIRED_DEPARTMENT;
         result = false;
       } else {
-        this.error.DepartmentId = "";
+        this.error.DepartmentID = null;
       }
+
+      if (
+        this.$store.state.Employee?.DateofBirth &&
+        !this.validateDayOfBirth(this.$store.state.Employee?.DateofBirth)
+      ) {
+        this.error.DateofBirth = MESSAGE_VALIDATE.MESSAGE_VALIDATE_DATEOFBIRTH;
+        console.log(this.error.DateofBirth);
+        result = false;
+      } else {
+        this.error.DateofBirth = null;
+      }
+
       return result;
     },
     /**
@@ -591,8 +674,12 @@ export default {
      * Author : DTANH(03/11/2022)
      */
     checkValueWithRegexNumber(value) {
-      let regex = REGEX_NUMBER;
-      return regex.test(value);
+      try {
+        let regex = REGEX_NUMBER;
+        return regex.test(value);
+      } catch (err) {
+        console.log(err);
+      }
     },
 
     /**
@@ -600,23 +687,32 @@ export default {
      * Author : DTANH(03/11/2022)
      */
     checkLength(value, length) {
-      let regex = new RegExp(`^.{0,${length}}$`, "i");
-      return regex.test(value);
+      try {
+        let regex = new RegExp(`^.{0,${length}}$`, "i");
+        return regex.test(value);
+      } catch (err) {
+        console.log(err);
+      }
     },
 
     /**
      * chọn giới tính
      * @param {event} e
+     * Author : DTANH (25/10/2022)
      */
     choseGender(e) {
-      this.$store.commit(SET_ONE_EMPLOYEE, {
-        ...this.$store.state.Employee,
-        Gender: e.target.value,
-        GenderName: e.target.dataset.label,
-      });
-      // this.$store.state.Employee.Gender = e.target.value;
-      // this.$store.state.Employee.GenderName = e.target.dataset.label;
-      this.$store.commit(SET_MODIFIED_FORM, false);
+      try {
+        this.$store.commit(SET_ONE_EMPLOYEE, {
+          ...this.$store.state.Employee,
+          Gender: Number(e.target.value),
+          GenderName: e.target.dataset.label,
+        });
+        // this.$store.state.Employee.Gender = e.target.value;
+        // this.$store.state.Employee.GenderName = e.target.dataset.label;
+        this.$store.commit(SET_MODIFIED_FORM, false);
+      } catch (err) {
+        console.log(err);
+      }
     },
 
     /**
@@ -638,40 +734,77 @@ export default {
     },
     /**
      * Xử lý khi ấn nút cất
+     * Author : DTANH (25/10/2022)
      */
-    handleSaveData() {
+    async handleSaveData() {
+      this.validateBeforeSave();
       // debugger;
       // this.validateForm();
       // this.Employee.EmployeeName
-      if (!this.validateForm()) return;
-      if (
-        !_.isEqual(this.$store.state.Employee, this.$store.state.cloneEmployee)
-      ) {
-        this.dialogData.dialogShow = true;
-        this.dialogData.type = "info";
-        this.dialogData.description =
-          "Dữ liệu đã bị thay đổi. Bạn có muốn cất không?";
-        this.dialogData.handleChoseYes = this.handleChoseYes;
+      if (!this.$store.state.editForm) {
+        if (!this.validateForm()) return;
+        await this.$store.dispatch("addEmployee", { data: this.$store.state.Employee , closePopup: true});
+        
       } else {
-        this.handleShowPopup();
-        // if (this.editForm) {
-        //   this.$store.dispatch("editEmployee", {
-        //     id: this.$store.state.Employee.EmployeeId,
-        //     data: this.$store.state.Employee,
-        //   });
-        //   this.$store.commit(SET_MODIFIED_FORM, true);
-        // } else {
-        //   this.$store.dispatch("addEmployee", this.$store.state.Employee);
-        //   this.$store.commit(STATUS_POPUP);
-        //   this.$store.commit(SET_MODIFIED_FORM, true);
-        // }
+        if (!this.validateForm()) return;
+        if (
+          !_.isEqual(
+            this.$store.state.Employee,
+            this.$store.state.cloneEmployee
+          )
+        ) {
+          this.dialogData.dialogShow = true;
+          this.dialogData.type = "info";
+          this.dialogData.description =
+            "Dữ liệu đã bị thay đổi. Bạn có muốn cất không?";
+          this.dialogData.handleChoseYes = this.handleChoseYes;
+          this.dialogData.btnText = "Có";
+          this.dialogData.btnTextSecondary = "Hủy";
+          this.dialogData.btnSecondaryChoseNo = "Không";
+        } else {
+          this.handleShowPopup();
+        }
       }
     },
 
     /**
-     * Xử lý khi ấn nút Có trong popup báo dữ liệu thay đổi
+     * validate khi click cất và cất hoặc thêm mà không có dữ liệu
+     * Author : DTANH (25/10/2022)
      */
-    handleChoseYes() {
+    validateBeforeSave() {
+      let result = true;
+      if (
+        !this.checkPropertyExist(this.$store.state.Employee, NAME_PROPERTIES.EMPLOYEENAME)
+      ) {
+        this.error.EmployeeName = "Tên nhân viên không được để trống";
+        this.$store.commit(SET_ONE_EMPLOYEE, {
+          ...this.$store.state.Employee,
+          EmployeeName: null,
+        });
+        result = false;
+      } else {
+        this.error.EmployeeName = null;
+      }
+      if (
+        !this.checkPropertyExist(this.$store.state.Employee, NAME_PROPERTIES.DEPARTMENTID)
+      ) {
+        this.error.DepartmentID = MESSAGE_VALIDATE.MESSAGE_REQUIRED_DEPARTMENT;
+        this.$store.commit(SET_ONE_EMPLOYEE, {
+          ...this.$store.state.Employee,
+          DepartmentID: null,
+        });
+        result = false;
+      } else {
+        this.error.DepartmentID = null;
+      }
+      return result;
+    },
+
+    /**
+     * Xử lý khi ấn nút Có trong popup báo dữ liệu thay đổi
+     * Author : DTANH (25/10/2022)
+     */
+     handleChoseYes() {
       if (this.editForm) {
         this.$store.dispatch("editEmployee", {
           id: this.$store.state.Employee.EmployeeId,
@@ -679,13 +812,14 @@ export default {
         });
         this.$store.commit(SET_MODIFIED_FORM, true);
       } else {
-        this.$store.dispatch("addEmployee", this.$store.state.Employee);
+       this.$store.dispatch("addEmployee", this.$store.state.Employee);
         this.$store.commit(STATUS_POPUP);
         this.$store.commit(SET_MODIFIED_FORM, true);
       }
     },
     /**
      * Đóng popup
+     * this.dataShow
      */
     handleClosePopup() {
       this.dialogData.dialogShow = false;
@@ -695,7 +829,7 @@ export default {
      * author : DTANH(31/10/2022)
      */
     async handleAddData() {
-      await this.$store.dispatch("addEmployee", this.$store.state.Employee);
+      await this.$store.dispatch("addEmployee", { data : this.$store.state.Employee});
     },
 
     /**
@@ -723,17 +857,16 @@ export default {
       "resError",
       "editForm",
       "cloneEmployee",
+      "newEmployeeCode",
     ]),
     ...mapMutations([STATUS_POPUP]),
-    ...mapGetters(["getDepartmentNameById"]),
-  },
-
-  mounted() {
-    this.$refs.empCode.$el.querySelector("input[type=text]").focus();
-    this.getAllDepartment();
+    ...mapGetters(["getDepartmentNameById", "getNewEmployeeCode"]),
   },
 
   watch: {
+    /**
+     * Hiển dialog khi có lỗi
+     */
     resError: function () {
       if (!_.isEmpty(this.resError)) {
         this.dialogData.dialogShow = true;
@@ -742,9 +875,13 @@ export default {
         this.dialogData.btnText = "Đồng ý";
         this.dialogData.btnTextSecondary = null;
         this.dialogData.btnSecondaryChoseNo = null;
-        this.dialogData.handleChoseYes = this.handleClosePopup
+        this.dialogData.handleChoseYes = this.handleClosePopup;
       }
     },
+  },
+
+  created() {
+    this.GENDER = GENDER;
   },
 };
 </script>

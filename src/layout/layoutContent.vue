@@ -49,7 +49,7 @@ export default {
   background-color: #f1f1f1;
   padding-top: 24px;
   padding-left: 24px;
-  padding-right: 12px;
+  padding-right: 16px;
   padding-bottom: 12px;
 }
 .wrap__content {

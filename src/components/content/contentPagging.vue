@@ -13,24 +13,11 @@
           id="dropdown__range--pagging"
           :arrays="paggingRange"
           moveToTop
-          :defaultValue="pageSize + ' bản ghi trên 1 trang'"
+          :defaultValue="pageSize + ' bản ghi trên trang'"
           isValidate
         ></myDropdown>
       </div>
-      <div class="flex align-center gap-x-16">
-        <!-- <div>
-          <span class="pagging__range__number"
-            >{{ startPage }} -
-            {{ endPage }}
-          </span>
-          <span>bản ghi</span>
-        </div> -->
-        <!-- <span class="pagging__option" @click="prevPage">
-          <i class="icofont-rounded-left"></i
-        ></span>
-        <span class="pagging__option" @click="nextPage"
-          ><i class="icofont-rounded-right"></i
-        ></span> -->
+      <div class="flex align-center gap-x-16">       
         <Pagging></Pagging>
       </div>
     </div>
@@ -62,6 +49,8 @@ export default {
     ...mapActions(["incrementPageNumber","decrementPageNumber","filterEmployee"]),
     
   },
+  
+  
   computed: {
     /**
      * Tính bản ghi bắt đầu của trang hiện tại

@@ -1,6 +1,6 @@
 <template lang="">
   <div :class="classProps">
-    <label :for="name" :class="{field__required : required}">{{ label }}</label>
+    <label :for="name" :class="{field__required : required}" :title="title">{{ label }}</label>
     <input
       :type="typeInput"
       class="input__custom primary-input" :class="{error: error}"
@@ -11,6 +11,7 @@
       @blur="onChange"
       @input="onChange"
       ref="focusMe"
+      :tabindex="tabIndex"
       autoforcus
     />
     <span class="input__text-error" :class="{show:error}" :title="error">{{error}}</span>
@@ -69,6 +70,9 @@ export default {
     },
   },
   methods: {
+    /**
+     * gửi dữ liệu từ input lên component cha
+     */
     onChange: function (event) {
       this.$store.commit(SET_MODIFIED_FORM,false)
       this.$emit("returnValue", {
@@ -76,9 +80,17 @@ export default {
         value: event.target.value,
       });
     },
+    /**
+     * focus vào input
+     */
+    focus: function () {
+    this.$refs.focusMe.focus()
+    }
   },
   mounted() {
-    console.log(this.autoforcus);
+    /**
+     * Auto focus vào input khi có props autoforcus
+     */
     if (this.autoforcus) {     
       this.$refs.focusMe.focus();
     }

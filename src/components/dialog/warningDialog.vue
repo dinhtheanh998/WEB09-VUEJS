@@ -99,7 +99,7 @@ export default {
   border-bottom: 1px solid var(--border-color);
 }
 .dialog__footer {
-  padding-top: 12px;
+  padding-top: 24px;
 }
 .dialog__body-description {
   color: var(--text-color);

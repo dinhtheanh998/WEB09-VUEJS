@@ -3,15 +3,14 @@
     <div class="context__menu__item" @click="emmitClickDelete">
       <a> Xóa </a>
     </div>
-    <div class="context__menu__item">
+    <div class="context__menu__item" @click="handleDuplicateEmployee">
       <a> Nhân bản </a>
-    </div>
-    <div class="context__menu__item">
-      <a> Xóa </a>
-    </div>
+    </div>    
   </div>
 </template>
 <script>
+import { SET_ONE_EMPLOYEE, STATUS_POPUP } from '@/store/Mutatios.Type';
+import { mapActions, mapMutations } from 'vuex';
 export default {
     props: {
         coord: {
@@ -21,12 +20,27 @@ export default {
             type: Object,
         }
     },
-    methods: {
+  methods: {
+    ...mapActions(["getNewEmployeeCod"]),
+      /**
+       * Gửi sự kiện xóa nhân viên đến component cha
+       * Author : DTANH (25/10/2022)
+       */
       emmitClickDelete() {
-        debugger
-        console.log(this.item.EmployeeID)
             this.$emit("clickDelete", this.item.EmployeeId);
-        }
+    },
+      /**
+       * Nhân bản nhân viên
+       * Author : DTANH (25/10/2022)
+       */
+      handleDuplicateEmployee() {
+        this.$store.dispatch("getNewEmployeeCod")
+        this.$store.commit(SET_ONE_EMPLOYEE, { ...this.item, EmployeeCode: this.$store.state.newEmployeeCode });
+        this.$store.commit(STATUS_POPUP, true);
+      }
+  },
+    computed: {
+      ...mapMutations([STATUS_POPUP],[SET_ONE_EMPLOYEE])
     }
 };
 </script>
