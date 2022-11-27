@@ -2,15 +2,16 @@
   <div class="dialog" :style="[zIndex ? 'z-index: 999' : '']">
     <div class="dialog__overlay"></div>
     <div class="dialog__container flex-col">
+      <div class="dialog__body--title">{{titleDialog}}</div>
       <div class="dialog__body flex align-center gap-x-16 grow-1">
-        <div class="dialog__body-type" :class="type"></div>
+        <div class="dialog__body-type" :class="type" v-show="type"></div>
         <div class="dialog__body-description">
           {{ description }}
         </div>
       </div>
       <div
         class="dialog__footer flex gap-x-8"
-        :class="[btnTextSecondary ? 'justify-between' : 'justify-end']"
+        :class="[btnTextSecondary ? 'justify-end' : 'justify-end']"
       >
         <myButton
           v-show="btnTextSecondary"
@@ -29,6 +30,7 @@
             :btnText="btnTextPrimary"
             isPrimary
             @click="handleDeleteTrue(event, id)"
+            :color="color"
           ></myButton>
         </div>
       </div>
@@ -41,7 +43,7 @@ export default {
   props: {
     description: {
       type: String,
-      default: "Bạn có chắc chắn muốn xóa nhân viên này không?",
+      default: "",
     },
     handleDeleteFalse: {
       type: Function,
@@ -54,6 +56,7 @@ export default {
     },
     type: {
       type: String,
+      default:null
     },
     btnTextPrimary: {
       type: String,
@@ -70,6 +73,14 @@ export default {
       type: Boolean,
       default: false,
     },
+    color: {
+      type: String,
+      default: "",
+    },
+    titleDialog: {
+      type: String,
+      default: "Thông báo",
+    }
   },
   components: {
     myButton,
@@ -92,6 +103,7 @@ export default {
   padding: 24px;
   border-radius: 4px;
   min-width: 400px;
+  max-width: 450px;
 }
 
 .dialog__body {
@@ -100,10 +112,28 @@ export default {
 }
 .dialog__footer {
   padding-top: 24px;
+
+}
+
+.dialog__body--title {
+  font-size: 20px;
+  font-weight: bold;
+  text-align: left;
+  color: var(--text-color);
 }
 .dialog__body-description {
   color: var(--text-color);
   font-size: 14px;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 18px;
+}
+
+.dialog__body-type {
+  flex-shrink: 0;
 }
 .dialog__body-type.warning {
   width: 36px;

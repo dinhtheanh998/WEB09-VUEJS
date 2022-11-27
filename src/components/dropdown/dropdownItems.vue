@@ -1,7 +1,7 @@
 <template lang="">
-  <div class="dropdown__item" @click="doFunc" :data-value="dataValue" :class="{active: pageSize == dataValue || dataValue == Employee.DepartmentID}">
+  <div class="dropdown__item" @click="doFunc" :data-value="dataValue" :class="{active: pageSize == dataValue || dataValue == Employee.DepartmentID}" tabindex="-1">
     {{ item.text || item.DepartmentName }}
-  </div>
+  </div>  
 </template>
 <script>
 import { CHANGE_PAGE_NUMBER, CHANGE_PAGE_SIZE } from "@/store/Mutatios.Type";
@@ -32,6 +32,7 @@ export default {
   methods: {
     doFunc() {
       this.selectedValue(this.item.text || this.item.DepartmentName);
+      // console.log(this.$el.focus())
       this.closeDropdown();
       if (this.item.value) {
         let newTotalRecord = this.pageNumber * Number(this.item.value);
@@ -76,5 +77,9 @@ export default {
 }
 .dropdown__item.active {
   background-color: var(--hover-color);
+}
+.dropdown__item:focus{
+  background-color: var(--hover-color);
+  outline: none;
 }
 </style>

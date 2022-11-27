@@ -7,7 +7,7 @@
       <!-- <layoutContent></layoutContent> -->
     </div>
   </div>
-  <!-- <mydialog description="Bạn có muốn xóa nhân viên này không"></mydialog> -->
+  <!-- <mydialog description="Bạn có muốn xóa nhân viên này không" btnTextPrimary="Có, xóa nhân viên" btnTextSecondary="Không" :color="color.DELETE"></mydialog> -->
   <!-- <myCheckbox></myCheckbox> -->
   <!-- <TestComponentVue></TestComponentVue>
   <div style="margin:32px 0"></div>
@@ -16,6 +16,27 @@
   <!-- <ToastTiFiVue></ToastTiFiVue> -->
   <FilterConditionVue :typeFilter="4" ></FilterConditionVue>
   <ToastTiFiMISA></ToastTiFiMISA>
+  <warningDialogVue
+        v-if="dialogData.dialogShow"
+        :description="dialogData.description"
+        :type="dialogData.type"
+        zIndex="true"
+        :btnTextPrimary="dialogData.btnText"
+        :btnSecondaryChoseNo="dialogData.btnSecondaryChoseNo"
+        :btnTextSecondary="dialogData.btnTextSecondary"
+        :handleSecondaryChoseNo="
+          () => {
+            dialogData.dialogShow = false;
+            handleShowPopup();
+          }
+        "
+        :handleDeleteFalse="
+          () => {
+            dialogData.dialogShow = false;
+          }
+        "
+        :handleDeleteTrue="dialogData.handleChoseYes"
+      />
 </template>
 
 <script>
@@ -26,18 +47,21 @@ import layoutHeader from "./layout/LayoutHeader.vue";
 // import ToastTiFiVue from "./components/toastifi/ToastTiFi.vue";
 import ToastTiFiMISA from "./components/toastifi/ToastTiFiMISA.vue";
 import FilterConditionVue from "./components/dialog/FilterCondition.vue";
+import _ from "lodash";
 import { mapState } from 'vuex';
 import { SET_TOAST } from "./store/Mutatios.Type";
 // import layoutContent from "./layout/layoutContent.vue";
 // import myCheckbox from "./components/checkbox/myCheckbox.vue"
 // import  myDropdown from "./components/dropdown/myDropdown.vue"
-// import mydialog from "./components/dialog/warningDialog.vue"
+import warningDialogVue from "./components/dialog/WarningDialog.vue"
+import { COLOR } from "./config/Common";
 export default {
   name: 'App',
   data: function () {
     return {
       showPopup: false,
-      paggingRange:[10,20,30,50]
+      paggingRange:[10,20,30,50],
+      color: COLOR
     }
   },
   components: {
@@ -48,6 +72,7 @@ export default {
     // ToastTiFiVue,
     FilterConditionVue,
     ToastTiFiMISA,
+    warningDialogVue
     // layoutContent,
     // myCheckbox
     // myDropdown,
@@ -79,8 +104,25 @@ export default {
     }
   },
   computed: {
-        ...mapState(["pageNumber","totalPage","toastState"])
-    },
+        ...mapState(["pageNumber","totalPage","toastState","resError","dialogData"])
+  },
+  // watch: {
+  //   /**
+  //    * Hiển dialog khi có lỗi
+  //    */
+  //   resError: function () {
+  //     console.log("111")
+  //     if (!_.isEmpty(this.resError)) {
+  //       this.dialogData.dialogShow = true;
+  //       this.dialogData.type = "warning";
+  //       this.dialogData.description = this.resError.errorMsg;
+  //       this.dialogData.btnText = "Đồng ý";
+  //       this.dialogData.btnTextSecondary = null;
+  //       this.dialogData.btnSecondaryChoseNo = null;
+  //       this.dialogData.handleChoseYes = this.handleClosePopup;
+  //     }
+  //   },
+  // }
 }
 </script>
 <style lang="css" scoped>

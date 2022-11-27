@@ -7,41 +7,67 @@
           <th class="headcol">
             <label
               class="checkbox custom__checkbox"
-              :class="{ checked: isCheckAll}"
+              :class="{ checked: isCheckAll2 }"
               for-html="checkbox__header"
             >
               <input
                 type="checkbox"
                 id="checkbox__header"
                 hidden
-                v-model="isCheckAll"
+                v-model="isCheckAll2"
                 @click="clickCheckAll"
+                
               />
-              <div v-if="isCheckAll" class="wrap__icon-custom">
+              <div v-if="isCheckAll2" class="wrap__icon-custom">
                 <i class="icofont-check-alt"></i>
               </div>
             </label>
           </th>
-          <th data-name="EmployeeCode" @click="setQueryFilter">{{FieldName.employeeCode}}</th>
-          <th data-name="EmployeeName" @click="setQueryFilter">{{FieldName.employeeName}}</th>
-          <th data-name="">{{FieldName.gender}}</th>
-          <th data-name="" class="text-center">{{FieldName.dateOfBirth}}</th>
-          <th data-name="IndentityNumber" :title="Tooltip.indentityNumber" @click="setQueryFilter">{{FieldName.identityNumber}}</th>
-          <th data-name="" >{{FieldName.position}}</th>
-          <th data-name="">{{FieldName.departmentCode}}</th>
-          <th data-name="">{{FieldName.departmentName}}</th>
-          <th data-name="BankNumber" @click="setQueryFilter">{{FieldName.bankNumber}}</th>
-          <th data-name="BankName" @click="setQueryFilter">{{FieldName.bankName}}</th>
-          <th data-name="BankBranch" :title="Tooltip.bankBranch" @click="setQueryFilter">{{FieldName.branchName}}</th>
-          <th data-name="">{{FieldName.address}}</th>
-          <th data-name="" :title="Tooltip.telePhoneNumber">{{FieldName.phoneNumber}}</th>
+          <th data-name="EmployeeCode" @click="setQueryFilter">
+            {{ FieldName.employeeCode }}
+          </th>
+          <th data-name="EmployeeName" @click="setQueryFilter">
+            {{ FieldName.employeeName }}
+          </th>
+          <th data-name="">{{ FieldName.gender }}</th>
+          <th data-name="" class="text-center">{{ FieldName.dateOfBirth }}</th>
+          <th
+            data-name="IndentityNumber"
+            :title="Tooltip.indentityNumber"
+            @click="setQueryFilter"
+          >
+            {{ FieldName.identityNumber }}
+          </th>
+          <th data-name="">{{ FieldName.position }}</th>
+          <th data-name="">{{ FieldName.departmentCode }}</th>
+          <th data-name="">{{ FieldName.departmentName }}</th>
+          <th data-name="BankNumber" @click="setQueryFilter">
+            {{ FieldName.bankNumber }}
+          </th>
+          <th data-name="BankName" @click="setQueryFilter">
+            {{ FieldName.bankName }}
+          </th>
+          <th
+            data-name="BankBranch"
+            :title="Tooltip.bankBranch"
+            @click="setQueryFilter"
+          >
+            {{ FieldName.branchName }}
+          </th>
+          <th data-name="">{{ FieldName.address }}</th>
+          <th data-name="" :title="Tooltip.telePhoneNumber">
+            {{ FieldName.phoneNumber }}
+          </th>
           <th data-name="" class="lastcol text-center">Chức năng</th>
         </tr>
         <tbody>
           <div class="loading" v-if="loading">
             <div class="loading__icon"></div>
-          </div>   
-          <div v-else-if="!listEmployee || listEmployee.length == 0" class="loading">
+          </div>
+          <div
+            v-else-if="!listEmployee || listEmployee.length == 0"
+            class="loading"
+          >
             <div class="text-center">Không có dữ liệu</div>
           </div>
           <tr
@@ -54,7 +80,8 @@
           >
             <td class="headcol">
               <label
-                class="checkbox custom__checkbox" :class="{ 'checked': item.isChecked }"
+                class="checkbox custom__checkbox"
+                :class="{ checked: item.isChecked }"
                 :for-html="item.EmployeeId"
               >
                 <input
@@ -64,6 +91,7 @@
                   v-model="item.isChecked"
                   @change="rowChecked(item.EmployeeId)"
                 />
+
                 <div v-if="item.isChecked" class="wrap__icon-custom">
                   <i class="icofont-check-alt"></i>
                 </div>
@@ -82,12 +110,12 @@
             </td>
             <td>{{ item.IdentityNumber }}</td>
             <td>{{ item.JobPositionName }}</td>
-            <td>{{item.DepartmentCode}}</td>
-            <td>{{item.DepartmentName}}</td>
+            <td>{{ item.DepartmentCode }}</td>
+            <td>{{ item.DepartmentName }}</td>
             <td>{{ item.BankNumber }}</td>
             <td>{{ item.BankName }}</td>
-            <td>{{ item.BankBranch}}</td>
-            <td>{{item.Adress}}</td>
+            <td>{{ item.BankBranch }}</td>
+            <td>{{ item.Adress }}</td>
             <td>{{ item.TelephoneNumber }}</td>
             <td
               class="lastcol text-center"
@@ -99,8 +127,8 @@
                   @click="
                     () => {
                       // getEmployeeByCode(item.EmployeeCode);
-                       getEmployeeById(item.EmployeeId);
-                        showPopup();
+                      getEmployeeById(item.EmployeeId);
+                      showPopup();
                     }
                   "
                 >
@@ -125,10 +153,12 @@
       infoAndCoord.item.EmployeeCode +
       '\> không?'
     "
+    :btnTextPrimary="showDialogDel.btnTextPrimary"
     :handleDeleteTrue="handleDeleteTrue"
     :handleDeleteFalse="handleDeleteFalse"
-    type="warning"
-    btnTextSecondary="Hủy"
+    :color="color.DELETE"
+    titleDialog="Xóa nhân viên?"
+    btnTextSecondary="Không"
   ></warningDialogVue>
   <teleport to="body">
     <ContextMenu
@@ -139,8 +169,14 @@
       id="context__menu"
     ></ContextMenu>
   </teleport>
-  <teleport to='body'>
-    <FilterConditionVue :typeFilter="1" v-if="filterInfo.status" :coord="filterInfo.coord" :name="filterInfo.name" :title="filterInfo.title"></FilterConditionVue>
+  <teleport to="body">
+    <FilterConditionVue
+      :typeFilter="1"
+      v-if="filterInfo.status"
+      :coord="filterInfo.coord"
+      :name="filterInfo.name"
+      :title="filterInfo.title"
+    ></FilterConditionVue>
   </teleport>
 </template>
 <script>
@@ -149,6 +185,7 @@ import FilterConditionVue from "../dialog/FilterCondition.vue";
 import {
   DEFAULT_PAGE_SIZE,
   DEFAULT_PAGE_NUMBER,
+  COLOR,
 } from "../../config/Common";
 // eslint-disable-next-line no-unused-vars
 import RowDataTable from "./TableRowData.vue";
@@ -156,15 +193,22 @@ import warningDialogVue from "../dialog/WarningDialog.vue";
 import ContextMenu from "../dialog/ContextMenu.vue";
 // import axios from "axios";
 import { mapActions, mapState } from "vuex";
-import { SET_CHECK_ALL, SET_EDITFORM, SET_LIST_DELETE_EMP, SET_MODIFIED_FORM, SET_TITLE_POPUP, STATUS_POPUP } from "@/store/Mutatios.Type";
+import {
+  SET_CHECK_ALL,
+  SET_EDITFORM,
+  SET_LIST_DELETE_EMP,
+  SET_MODIFIED_FORM,
+  SET_TITLE_POPUP,
+  STATUS_POPUP,
+} from "@/store/Mutatios.Type";
 import { GENDER } from "../../Enums/Enums";
-import { FIELD_NAME , TOOLTIP} from "../../resource/ResourceVN";
+import { FIELD_NAME, TOOLTIP } from "../../resource/ResourceVN";
 export default {
   data: function () {
     return {
       // số bản ghi trên trang
       recordPerPage: 0,
- 
+
       // Tổng số bản ghi
       totalRecord: 0,
 
@@ -178,14 +222,14 @@ export default {
       showDialogDel: {
         isShow: false,
         id: null,
+        btnTextPrimary: "",
       },
       //Hiển thị context menu
       showContextMenu: false,
-   
+
       //Thông tin và tọa độ của context menu
       infoAndCoord: {
         item: null,
-
         coord: {},
       },
 
@@ -193,31 +237,32 @@ export default {
       refeshData: Function,
 
       FieldName: FIELD_NAME,
-      Tooltip: TOOLTIP
-      
+
+      Tooltip: TOOLTIP,
+
+      color: COLOR,
     };
   },
   components: {
     contentPagging,
     warningDialogVue,
     ContextMenu,
-    FilterConditionVue
+    FilterConditionVue,
   },
   props: {
     forceRender: {
       type: Function,
     },
     id: {
-      type:String,
-    }
+      type: String,
+    },
   },
   methods: {
     /**
      * Hiển thị filter nâng cao
-     * @param {*} e 
+     * @param {*} e
      */
     setQueryFilter(e) {
-      console.dir(e.target)
       this.$store.commit("setFilterInfo", {
         coord: e.target.getBoundingClientRect(),
         name: e.target.dataset.name,
@@ -229,7 +274,7 @@ export default {
     /**
      * Mở popup sửa khi double click vào dòng
      * Author : DTANH (25/10/2022)
-    */
+     */
     handleDoubleClickRow(item) {
       this.getEmployeeById(item.EmployeeId);
       this.showPopup();
@@ -246,39 +291,43 @@ export default {
           case GENDER.MALE:
             gen = "Nam";
             break;
-            case GENDER.FEMALE:
-              gen = "Nữ";
+          case GENDER.FEMALE:
+            gen = "Nữ";
             break;
-            case GENDER.OTHER:
+          case GENDER.OTHER:
             gen = "Khác";
             break;
         }
-        return gen
+        return gen;
       } catch (err) {
-        console.log(err)
+        console.log(err);
       }
     },
     /**
-     * Click header checkbox thì check toàn bộ các checkbox và thêm vào mảng 
+     * Click header checkbox thì check toàn bộ các checkbox và thêm vào mảng
      * Author : DTANH (01/11/2022)
      */
     clickCheckAll() {
       try {
-        if (this.isCheckAll) {
+        if (this.isCheckAll2) {
           this.listEmployee.forEach((item) => {
             item.isChecked = false;
-            this.$store.commit(SET_CHECK_ALL, false);
-            this.$store.commit(SET_LIST_DELETE_EMP,[]);
+            this.$store.commit(SET_LIST_DELETE_EMP, this.listDeleteIdEmployee.filter(
+              (item2) => item2 !== item.EmployeeId
+            ));
           });
-        }else {
+        } else {
           this.listEmployee.forEach((item) => {
             item.isChecked = true;
-            this.$store.commit(SET_CHECK_ALL, true);
-            this.$store.commit(SET_LIST_DELETE_EMP, this.listEmployee);
+            if(!this.listDeleteIdEmployee.includes(item.EmployeeId)){
+              this.$store.commit(SET_LIST_DELETE_EMP, [...this.listDeleteIdEmployee, item.EmployeeId]);
+            }
+            // this.$store.commit(SET_CHECK_ALL, true);
           });
+          
         }
       } catch (err) {
-        console.log(err)
+        console.log(err);
       }
     },
 
@@ -289,19 +338,23 @@ export default {
      */
     rowChecked(id) {
       if (this.listDeleteIdEmployee.includes(id)) {
-        this.$store.commit(SET_LIST_DELETE_EMP,[
+        this.$store.commit(SET_LIST_DELETE_EMP, [
           ...this.listDeleteIdEmployee.filter((item) => item !== id),
         ]);
       } else {
-        this.$store.commit(SET_LIST_DELETE_EMP,[
+        this.$store.commit(SET_LIST_DELETE_EMP, [
           ...this.listDeleteIdEmployee,
           id,
         ]);
       }
-      this.$store.commit(SET_CHECK_ALL, this.listDeleteIdEmployee.length == this.listEmployee.length);
-      this.isCheckAll = this.listDeleteIdEmployee.length == this.listEmployee.length;
+      this.$store.commit(
+        SET_CHECK_ALL,
+        this.listDeleteIdEmployee.length == this.listEmployee.length
+      );
+      this.isCheckAll =
+        this.listDeleteIdEmployee.length == this.listEmployee.length;
     },
-    
+
     /**
      * hiện dialog và lấy Id của nhân viên cần xóa
      * @param {string} id
@@ -310,6 +363,7 @@ export default {
     handleEmitDelete(id) {
       this.showDialogDel.isShow = true;
       this.showDialogDel.id = id;
+      this.showDialogDel.btnTextPrimary = "Có, xóa nhân viên";
     },
 
     /**
@@ -348,7 +402,7 @@ export default {
      * Author: DTANH (25/10/2022)
      */
     deleteOneRecord(id) {
-      this.$store.dispatch("deleteEmployee", id);     
+      this.$store.dispatch("deleteEmployee", id);
     },
 
     /**
@@ -379,25 +433,44 @@ export default {
       this.$store.commit(SET_TITLE_POPUP, "Sửa nhân viên");
       this.$store.commit(STATUS_POPUP);
     },
-    ...mapActions(["filterEmployee", "getEmployeeById","deleteEmployee","getAllDepartment"]),
+    ...mapActions([
+      "filterEmployee",
+      "getEmployeeById",
+      "deleteEmployee",
+      "getAllDepartment",
+    ]),
   },
 
   computed: {
-    ...mapState(["listEmployee", "Employee", "listDeleteIdEmployee", "loading","listDepartment","isCheckAll","filterInfo"]),
+    ...mapState([
+      "listEmployee",
+      "Employee",
+      "listDeleteIdEmployee",
+      "loading",
+      "listDepartment",
+      "isCheckAll",
+      "filterInfo",
+    ]),
+    // ...mapGetters(["getListSelected"]),
+    /**
+     * lấy ra mảng các id từ mảng nhân viên
+     */
+    listID() {
+      return this.listEmployee.map((item) => item.EmployeeId);
+    },
+
+    isCheckAll2: function () {
+      let count = 0;
+      this.listEmployee.forEach((item) => {
+        if (item.isChecked) {
+          count++;
+        }
+      });
+      return count == this.listEmployee.length && count != 0;
+    },
+    
   },
 
-  watch: {
-    /**
-     * Theo dõi nếu isCheckALl đc check thì tất cả các checkbox trong table được check
-     */
-    isCheckAll: function () {
-      if (this.isCheckAll) {        
-        this.listEmployee.forEach((item) => (item.isChecked = true));
-        let payload = this.listEmployee.map((item) => item.EmployeeId);
-        this.$store.commit(SET_LIST_DELETE_EMP, payload);
-      }
-    },
-  },
   created() {
     this.eventBus.on("reloadData", (data) => {
       this.refeshData = data.returnValue;
@@ -413,9 +486,15 @@ export default {
     });
     this.$store.dispatch("getAllDepartment");
   },
+
   mounted() {
-    
+    document.addEventListener("keydown", (e) => {
+      if (e.keycode == 46) {
+        this.handleEmitDelete(this.listEmployee[0].EmployeeId);
+      }
+    });
   },
+
   unmounted() {
     this.eventBus.off("reloadData");
     document.removeEventListener("click", this.closeContextMenu);
@@ -433,7 +512,7 @@ export default {
 }
 .loading__icon {
   width: 50px;
-  height:50px;
+  height: 50px;
   border-radius: 50%;
   border: 5px solid var(--primary-color);
   border-top-color: transparent;

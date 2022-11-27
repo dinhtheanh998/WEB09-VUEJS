@@ -64,6 +64,7 @@
                 :defaultValue="Employee.DepartmentName || 'Chọn đơn vị'"
                 :tabIndex="3"
                 :errorMesage="error.DepartmentID"
+                v-click-away="onClickAway"
               ></myDropdown>
               <span
                 class="input__text-error"
@@ -96,7 +97,7 @@
             ></inputLabelAndError>
             <div class="flex-col wrap__gender wrap__textfield">
               <label for="">Giới tính</label>
-              <div class="flex gap-x-20 gender">
+              <div class="flex gap-x-20 gender" @keydown="changeGenderByKeyDown">
                 <div class="flex gap-x-12 align-center" @keydown.enter="chosseGenderByKeydown(GENDER.MALE,'Nam')">
                   <label
                     for="men"
@@ -286,6 +287,7 @@
             isSecondary
             @click.prevent="handleSaveData"
             :tabIndex="17"
+            title="Ctrl+F8"
           ></myButton>
           <myButton
           :btnText="Text.saveAndContinue"
@@ -391,12 +393,32 @@ export default {
 
   methods: {
 
+    changeGenderByKeyDown(e) {
+      
+      if (e.keyCode == KEY_CODES.ARROW_LEFT) {
+        console.log(this.$store.state.Employee?.Gender)
+        this.$store.commit(SET_ONE_EMPLOYEE, {
+          ...this.$store.state.Employee,
+          Gender: +this.$store.state.Employee?.Gender - 1,
+          GenderName: "Nam",
+      });
+      }
+      if (e.keyCode == KEY_CODES.ARROW_RIGHT) {
+        console.log(this.$store.state.Employee?.Gender)
+        this.$store.commit(SET_ONE_EMPLOYEE, {
+          ...this.$store.state.Employee,
+          Gender: +this.$store.state.Employee?.Gender + 1,
+          GenderName: "Nam",
+      });
+      }
+    },
+
     chosseGenderByKeydown(value,name) {
       this.$store.commit(SET_ONE_EMPLOYEE, {
           ...this.$store.state.Employee,
           Gender: Number(value),
           GenderName: name,
-        });
+      });
     },
 
     /**
@@ -868,6 +890,7 @@ export default {
      * Hiển dialog khi có lỗi
      */
     resError: function () {
+      console.log("111")
       if (!_.isEmpty(this.resError)) {
         this.dialogData.dialogShow = true;
         this.dialogData.type = "warning";

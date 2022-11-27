@@ -28,7 +28,7 @@ export default {
 .sidebar {
   width: 200px;
   height: 100vh;
-  background-color: #393a3e;
+  background-color: #001833;
   transition: all 0.2s ease-in-out;
 }
 .sidebar.sidebar--shink {

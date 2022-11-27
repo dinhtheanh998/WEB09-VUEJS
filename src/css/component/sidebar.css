@@ -71,15 +71,16 @@
   color: #fff;
 }
 .sidebar__menu__item:hover {
-  background-color: #5c5c5c;
+  background-color: #3395FF;
 }
 
 .router-link-active .sidebar__menu__item {
-  background: #5c5c5c;
-  border-top-left-radius: 0px;
-  border-bottom-left-radius: 0px;
-  border-left: 4px solid var(--primary-color);
+  background: #3395FF;
   text-decoration: none;
+}
+
+.router-link-active .sidebar__menu__item .sidebar__menu__item__icon, .router-link-active .sidebar__menu__item .sidebar__menu__item__text {
+  opacity: 1;
 }
 
 .sidebar__menu__item__icon {

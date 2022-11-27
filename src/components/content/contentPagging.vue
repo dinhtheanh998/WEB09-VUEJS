@@ -14,7 +14,7 @@
           :arrays="paggingRange"
           moveToTop
           :defaultValue="pageSize + ' bản ghi trên trang'"
-          isValidate
+          isValidate         
         ></myDropdown>
       </div>
       <div class="flex align-center gap-x-16">       

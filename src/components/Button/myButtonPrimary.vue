@@ -1,5 +1,5 @@
 <template lang="">
-    <button :type="typeBtn" class="btn" :class="{ 'btn--primary': isPrimary , 'btn--secondary': isSecondary }" :tabindex="tabIndex">{{ btnText }}</button>
+    <button :type="typeBtn" class="btn" :class="{ 'btn--primary': isPrimary , 'btn--secondary': isSecondary }" :tabindex="tabIndex" :style="[color ? `background-color:${color}` : '']">{{ btnText }}</button>
 </template>
 <script>
 export default {
@@ -23,7 +23,11 @@ export default {
     tabIndex: {
       type: Number,
       default: 0,
-    }
+    },
+    color: {
+      type: String,
+      default: "",
+    },
   },
 };
 </script>
@@ -62,4 +66,9 @@ export default {
 .btn:focus {
   box-shadow: 0 0 0 1px var(--primary-color);
 }
+
+.btn:active {
+  background: var(--button-active-color);
+}
+
 </style>

@@ -117,9 +117,28 @@ export default createStore({
       coord: {},
       title: "",
     },
+
+    // thông báo cho người dùng
+    dialogData: {
+      dialogShow: false,
+      type: "",
+      description: "",
+      btnText: "Có",
+      btnTextSecondary: "Hủy",
+      btnSecondaryChoseNo: "Không",
+      handleChoseYes: "",
+    },
   },
 
   mutations: {
+    // Hiển thị thông báo lỗi
+    setDialog(state, payload) { 
+      state.dialogData = {
+        ...state.dialogData,
+        ...payload,
+      };
+    },
+
     //
     setErrorValid(state, payload) {
       state.errorValid = payload;
@@ -337,7 +356,7 @@ export default createStore({
       if (getters["keyWord"]) {
         commit(CHANGE_PAGE_NUMBER, 1);
       }
-      try {
+      try {        
         commit(FETCH_START, true);
         let callAPI = axios.get(
           `${SECON_API.FILTER_EMPLOYEE}${
@@ -345,7 +364,10 @@ export default createStore({
           }pageSize=${pageSize}&pageNumber=${pageNumber}`
         );
         const res = await Promise.race([callAPI, timeout(TIMEOUT_SEC)]);
-        console.log(res);
+        res.data.Data.map(item => {
+          getters["getListSelected"].includes(item.EmployeeId) ? item.isChecked = true : item.isChecked = false;
+        })
+        commit(SET_CHECK_ALL, false);
         commit(FETCH_EMPLOYEE, res.data.Data);
         commit(SET_TOTAL_PAGE, res.data.TotalPage);
         commit(SET_TOTAL_RECORD, res.data.TotalRecord);
@@ -388,7 +410,10 @@ export default createStore({
           commit("copyEmployee", state.Employee);
         });
       } catch (error) {
-        console.log(error);
+        commit(SET_ERROR, {
+          errorCode: error.response.data.ErrorCode,
+          errorMsg: error.response.data.UserMsg,
+        });
       }
     },
 
@@ -476,7 +501,7 @@ export default createStore({
         .catch((error) => {
           console.log(error);
           commit(SET_ERROR, {
-            errorCode: error.response.status,
+            errorCode: error.response.data.ErrorCode,
             errorMsg: error.response.data.UserMsg,
           });
         });
@@ -522,7 +547,10 @@ export default createStore({
           }
         })
         .catch((error) => {
-          console.log(error);
+          commit(SET_ERROR, {
+            errorCode: error.response.data.ErrorCode,
+            errorMsg: error.response.data.UserMsg,
+          });
         });
     },
 
@@ -535,7 +563,10 @@ export default createStore({
         commit(SET_NEW_CODE, res.data);
         return res.data;
       } catch (error) {
-        console.log(error);
+        commit(SET_ERROR, {
+          errorCode: error.response.data.ErrorCode,
+          errorMsg: error.response.data.UserMsg,
+        });
       }
     },
 
@@ -555,18 +586,22 @@ export default createStore({
           }
           dispatch("reloadData");
         })
-        .catch((err) => {
-          console.log(err);
+        .catch((error) => {
+          commit(SET_ERROR, {
+            errorCode: error.response.data.ErrorCode,
+            errorMsg: error.response.data.UserMsg,
+          });
         });
     },
 
     /**
      * Xuất khẩu file excel
      */
-    exportExcel() {
+    exportExcel({ commit }) {
       axios
         .post(`${SECON_API.EMPLOYEE}/ExportExcel`)
-        .then((res) => {
+        .then((res) => { 
+          console.log(res)
           res.config.responseType = "blob";
           axios(res.config).then((res) => {
             const url = window.URL.createObjectURL(new Blob([res.data]));
@@ -577,8 +612,21 @@ export default createStore({
             link.click();
           });
         })
-        .catch((err) => {
-          console.log(err);
+        .catch((error) => {
+          console.log(error.response.data.UserMsg);
+          commit(SET_ERROR, {
+            errorCode: error.response.data.ErrorCode,
+            errorMsg: error.response.data.UserMsg,
+          });
+          commit("setDialog", {
+            dialogShow: true,
+            type: "",
+            description: error.response.data.UserMsg,
+            btnText: "Xác nhận",
+            btnTextSecondary: null,
+            btnSecondaryChoseNo: null,
+            handleChoseYes: closeDialog({ commit }),
+          })
         });
     },
   },
@@ -607,5 +655,14 @@ export default createStore({
     getNewEmployeeCode: (state) => {
       return state.newEmployeeCode;
     },
+    getListSelected: (state) => { 
+      return state.listDeleteIdEmployee;
+    }
   },
 });
+
+function closeDialog({ commit }) { 
+  commit("setDialog", {
+    dialogShow: false,
+  })
+}

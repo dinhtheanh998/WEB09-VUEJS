@@ -20,7 +20,7 @@
         </span>
         <span class="clear__select" @click="clickCheckAll">{{Text.removeSelected}}</span>
         <div>
-          <MyButtonIcon :btnText="Text.delete" isSecondary @click="onClickDeleteMulti"
+          <MyButtonIcon :btnText="Text.delete" isSecondary @click="onClickDeleteMulti" color="color.DELETE"
             ><i class="icofont-close-circled"></i
           ></MyButtonIcon>
         </div>
@@ -72,6 +72,7 @@ import _ from "lodash";
 import { mapActions, mapState } from "vuex";
 import { SEARCH_KEYWORD, SET_CHECK_ALL, SET_LIST_DELETE_EMP } from "@/store/Mutatios.Type";
 import  {TEXT,TOOLTIP} from "../../resource/ResourceVN"
+import { COLOR } from "@/config/Common";
 export default {
   data() {
     return {
@@ -81,7 +82,8 @@ export default {
         data: [],
       },
       Text: TEXT,
-      Tooltip:TOOLTIP
+      Tooltip: TOOLTIP,
+      color: COLOR
     };
   },
   components: {

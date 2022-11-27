@@ -71,5 +71,10 @@ export const SECON_API = {
     UPDATE_OR_INSERT_EMP: `${SECONDARY_URL}/Employees/updateOrInsert`,
 }
 
+export const COLOR = {
+    PRIMARY: "#007bff",
+    DELETE: "#E81E1E",
+}
+
 
 //https://amis.manhnv.net/api/v1/Employees/filter?pageSize=10&pageNumber=2&employeeFilter=a

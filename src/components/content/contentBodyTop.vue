@@ -68,7 +68,7 @@ export default {
     document.addEventListener("keydown", (e) => {
       if (e.key === "Insert") {
         this.handleShowPopup();
-      }
+      }     
     });
     this.$store.dispatch("getNewEmployeeCod");
   },
