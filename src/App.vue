@@ -24,17 +24,9 @@
         :btnTextPrimary="dialogData.btnText"
         :btnSecondaryChoseNo="dialogData.btnSecondaryChoseNo"
         :btnTextSecondary="dialogData.btnTextSecondary"
-        :handleSecondaryChoseNo="
-          () => {
-            dialogData.dialogShow = false;
-            handleShowPopup();
-          }
-        "
-        :handleDeleteFalse="
-          () => {
-            dialogData.dialogShow = false;
-          }
-        "
+        :color="dialogData.color"
+        :handleSecondaryChoseNo="handleChoseNo"
+        :handleDeleteFalse="handleChooseCancel"
         :handleDeleteTrue="dialogData.handleChoseYes"
       />
 </template>
@@ -42,17 +34,13 @@
 <script>
 import layoutSibar from "./layout/LayoutSibar.vue";
 import layoutHeader from "./layout/LayoutHeader.vue";
-// import TestComponentVue from "./components/TestComponent.vue";
-// import PaggingVue from "./components/pagging/Pagging.vue";
-// import ToastTiFiVue from "./components/toastifi/ToastTiFi.vue";
+import {handleShowPopup} from "./config/help"
 import ToastTiFiMISA from "./components/toastifi/ToastTiFiMISA.vue";
 import FilterConditionVue from "./components/dialog/FilterCondition.vue";
 import _ from "lodash";
 import { mapState } from 'vuex';
 import { SET_TOAST } from "./store/Mutatios.Type";
-// import layoutContent from "./layout/layoutContent.vue";
-// import myCheckbox from "./components/checkbox/myCheckbox.vue"
-// import  myDropdown from "./components/dropdown/myDropdown.vue"
+
 import warningDialogVue from "./components/dialog/WarningDialog.vue"
 import { COLOR } from "./config/Common";
 export default {
@@ -61,22 +49,16 @@ export default {
     return {
       showPopup: false,
       paggingRange:[10,20,30,50],
-      color: COLOR
+      color: COLOR,
+      handleShowPopup: handleShowPopup
     }
   },
   components: {
     layoutSibar,
-    layoutHeader,
-    // TestComponentVue,
-    // PaggingVue,
-    // ToastTiFiVue,
+    layoutHeader,    
     FilterConditionVue,
     ToastTiFiMISA,
-    warningDialogVue
-    // layoutContent,
-    // myCheckbox
-    // myDropdown,
-    // mydialog
+    warningDialogVue    
   },
   methods: {
     mounted() {
@@ -101,28 +83,53 @@ export default {
           message: ''
         })
       }, 2000)
-    }
+    },
+    // đóng dialog
+    closeDialog() {
+      this.$store.commit("setDialog", {
+        dialogShow: false,
+      });
+    },
+    /**
+     * Chọn không trong dialog
+     */
+    handleChoseNo() {
+      this.$store.commit("setDialog", {
+        dialogShow: false,
+        color: this.color.PRIMARY,
+      });
+      handleShowPopup();
+    },
+
+    /**
+     * Chọn hủy trong dialog
+     */
+    handleChooseCancel() {
+      this.$store.commit("setDialog", {
+        dialogShow: false,
+        color: this.color.PRIMARY,
+      });
+    },
   },
   computed: {
         ...mapState(["pageNumber","totalPage","toastState","resError","dialogData"])
   },
-  // watch: {
-  //   /**
-  //    * Hiển dialog khi có lỗi
-  //    */
-  //   resError: function () {
-  //     console.log("111")
-  //     if (!_.isEmpty(this.resError)) {
-  //       this.dialogData.dialogShow = true;
-  //       this.dialogData.type = "warning";
-  //       this.dialogData.description = this.resError.errorMsg;
-  //       this.dialogData.btnText = "Đồng ý";
-  //       this.dialogData.btnTextSecondary = null;
-  //       this.dialogData.btnSecondaryChoseNo = null;
-  //       this.dialogData.handleChoseYes = this.handleClosePopup;
-  //     }
-  //   },
-  // }
+  watch: {
+    /**
+     * Hiển dialog khi có lỗi
+     */
+    resError: function () {
+      if (!_.isEmpty(this.resError)) {
+        this.dialogData.dialogShow = true;
+        this.dialogData.type = "warning";
+        this.dialogData.description = this.resError.errorMsg;
+        this.dialogData.btnText = "Đồng ý";
+        this.dialogData.btnTextSecondary = null;
+        this.dialogData.btnSecondaryChoseNo = null;
+        this.dialogData.handleChoseYes = this.closeDialog;
+      }
+    },
+  }
 }
 </script>
 <style lang="css" scoped>

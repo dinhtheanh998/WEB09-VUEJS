@@ -2,6 +2,7 @@ import axios from "axios";
 import { createStore } from "vuex";
 import {
   API,
+  COLOR,
   DEFAULT_GENDER,
   DEFAULT_PAGE_NUMBER,
   DEFAULT_PAGE_SIZE,
@@ -127,6 +128,7 @@ export default createStore({
       btnTextSecondary: "Hủy",
       btnSecondaryChoseNo: "Không",
       handleChoseYes: "",
+      color: COLOR.PRIMARY
     },
   },
 
@@ -618,15 +620,6 @@ export default createStore({
             errorCode: error.response.data.ErrorCode,
             errorMsg: error.response.data.UserMsg,
           });
-          commit("setDialog", {
-            dialogShow: true,
-            type: "",
-            description: error.response.data.UserMsg,
-            btnText: "Xác nhận",
-            btnTextSecondary: null,
-            btnSecondaryChoseNo: null,
-            handleChoseYes: closeDialog({ commit }),
-          })
         });
     },
   },
@@ -661,8 +654,3 @@ export default createStore({
   },
 });
 
-function closeDialog({ commit }) { 
-  commit("setDialog", {
-    dialogShow: false,
-  })
-}

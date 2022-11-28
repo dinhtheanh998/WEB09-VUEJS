@@ -49,23 +49,8 @@
       ></div>
     </div>
   </div>
-  <teleport to="body">
-    <warningDialogVue
-      v-if="showDialogDel.isShow"
-      :description="
-        'Bạn có chắc chắn muốn xóa ' +
-        listDeleteIdEmployee.length +
-        ' nhân viên không?'
-      "
-      :handleDeleteFalse="handleDeleteFalse"
-      :handleDeleteTrue="handleDeleteTrue"
-      btnTextSecondary="Hủy"
-      type="warning"
-    ></warningDialogVue>
-  </teleport>
 </template>
 <script>
-import warningDialogVue from "../dialog/WarningDialog.vue";
 import MyButtonIcon from "../Button/MyButtonIcon.vue";
 import _ from "lodash";
 // import inputIcon from "../Input/inputWithIcon.vue";
@@ -88,11 +73,10 @@ export default {
   },
   components: {
     // inputIcon,
-    warningDialogVue,
     MyButtonIcon,
   },
   computed: {
-    ...mapState(["listDeleteIdEmployee", "listEmployee","isCheckAll"]),
+    ...mapState(["listDeleteIdEmployee", "listEmployee","isCheckAll","dialogData"]),
   },
   methods: {
     ...mapActions(["reloadData"]),
@@ -100,8 +84,7 @@ export default {
      * bỏ check toàn bộ bản ghi trong trang
      * Author : DTANH (25/10/2022)
      */
-    clickCheckAll() {
-      
+    clickCheckAll() {      
       this.listEmployee.forEach((item) => {
         item.isChecked = false;
         this.$store.commit(SET_CHECK_ALL, false);
@@ -113,9 +96,17 @@ export default {
      * @description: Hàm xử lý khi click vào nút xóa nhiều nhân viên
      * Author : DTANH (25/10/2022)
      */
-    onClickDeleteMulti() {
-      this.showDialogDel.isShow = true;
-      this.showDialogDel.data = this.listDeleteIdEmployee;
+    onClickDeleteMulti() { 
+      this.$store.commit("setDialog", {
+        dialogShow: true,
+        description: "Bạn có thực sự muốn xóa những nhân viên đã chọn không?",
+        btnText: "Có, xóa nhân viên",
+        btnTextSecondary: null,
+        handleChoseYes: this.handleDeleteTrue,
+        btnSecondaryChoseNo : "Không",
+        color: this.color.DELETE,
+      });
+        this.showDialogDel.data= this.listDeleteIdEmployee      
     },
 
     /** chọn hủy trong dialog
@@ -132,7 +123,10 @@ export default {
     handleDeleteTrue() {      
       this.$store.dispatch("deleteMultiEmployee", this.showDialogDel.data);
       this.showDialogDel.data = [];
-      this.showDialogDel.isShow = false;
+      this.$store.commit("setDialog", {
+        dialogShow: false,
+        color: this.color.PRIMARY,
+      });
     },
 
     /**

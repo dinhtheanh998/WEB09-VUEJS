@@ -13,7 +13,7 @@
               <input type="checkbox" id="isCustomer" hidden />
               <div class="custom-checkbox-wrap"></div>
             </label>
-            <label for="isCustomer">{{Text.isCustomer}}</label>
+            <label for="isCustomer">{{ Text.isCustomer }}</label>
           </div>
           <div class="flex align-center">
             <label
@@ -23,7 +23,7 @@
               <input type="checkbox" id="isSuplier" hidden />
               <div class="custom-checkbox-wrap"></div>
             </label>
-            <label for="isSuplier">{{Text.isSuplier}}</label>
+            <label for="isSuplier">{{ Text.isSuplier }}</label>
           </div>
         </div>
       </div>
@@ -97,8 +97,14 @@
             ></inputLabelAndError>
             <div class="flex-col wrap__gender wrap__textfield">
               <label for="">Giới tính</label>
-              <div class="flex gap-x-20 gender" @keydown="changeGenderByKeyDown">
-                <div class="flex gap-x-12 align-center" @keydown.enter="chosseGenderByKeydown(GENDER.MALE,'Nam')">
+              <div
+                class="flex gap-x-20 gender"
+                @keydown="changeGenderByKeyDown"
+              >
+                <div
+                  class="flex gap-x-12 align-center"
+                  @keydown.enter="chosseGenderByKeydown(GENDER.MALE, 'Nam')"
+                >
                   <label
                     for="men"
                     class="flex align-center gap-x-12 custom-radio"
@@ -118,7 +124,10 @@
                   </label>
                   <label for="men">Nam</label>
                 </div>
-                <div class="flex gap-x-12 align-center" @keydown.enter="chosseGenderByKeydown(GENDER.FEMALE,'Nữ')">
+                <div
+                  class="flex gap-x-12 align-center"
+                  @keydown.enter="chosseGenderByKeydown(GENDER.FEMALE, 'Nữ')"
+                >
                   <label
                     for="women"
                     class="flex align-center gap-x-8 custom-radio"
@@ -138,7 +147,10 @@
                   </label>
                   <label for="women">Nữ</label>
                 </div>
-                <div class="flex gap-x-12 align-center" @keydown.enter="chosseGenderByKeydown(GENDER.OTHER,'Khác')">
+                <div
+                  class="flex gap-x-12 align-center"
+                  @keydown.enter="chosseGenderByKeydown(GENDER.OTHER, 'Khác')"
+                >
                   <label
                     for="other"
                     class="flex align-center gap-x-8 custom-radio"
@@ -185,7 +197,7 @@
               @returnValue="returnValue"
             ></inputLabelAndError>
             <inputLabelAndError
-            :label="FieldName.indentityPlace"
+              :label="FieldName.indentityPlace"
               name="IdentityPlace"
               tabIndex="8"
               placeholderText="Bắc Ninh"
@@ -217,7 +229,7 @@
               title="Điện thoại di động"
             ></inputLabelAndError>
             <inputLabelAndError
-            :label="FieldName.phoneNumber"
+              :label="FieldName.phoneNumber"
               name="PhoneNumber"
               placeholderText="0241234567"
               tabIndex="11"
@@ -230,7 +242,7 @@
           </div>
           <div class="flex align-center w-full gap-x-8">
             <inputLabelAndError
-            :label="FieldName.email"
+              :label="FieldName.email"
               name="Email"
               placeholderText="company@example.com"
               tabIndex="12"
@@ -283,14 +295,14 @@
         ></myButton>
         <div class="flex align-center gap-x-12">
           <myButton
-          :btnText="Text.save"
+            :btnText="Text.save"
             isSecondary
             @click.prevent="handleSaveData"
             :tabIndex="17"
             title="Ctrl+F8"
           ></myButton>
           <myButton
-          :btnText="Text.saveAndContinue"
+            :btnText="Text.saveAndContinue"
             isPrimary
             typeBtn="submit"
             :tabIndex="16"
@@ -306,29 +318,6 @@
         ></div>
       </div>
     </form>
-    <Teleport to="body">
-      <warningDialogVue
-        v-if="dialogData.dialogShow"
-        :description="dialogData.description"
-        :type="dialogData.type"
-        zIndex="true"
-        :btnTextPrimary="dialogData.btnText"
-        :btnSecondaryChoseNo="dialogData.btnSecondaryChoseNo"
-        :btnTextSecondary="dialogData.btnTextSecondary"
-        :handleSecondaryChoseNo="
-          () => {
-            dialogData.dialogShow = false;
-            handleShowPopup();
-          }
-        "
-        :handleDeleteFalse="
-          () => {
-            dialogData.dialogShow = false;
-          }
-        "
-        :handleDeleteTrue="dialogData.handleChoseYes"
-      />
-    </Teleport>
   </div>
 </template>
 <script>
@@ -336,7 +325,6 @@
 import myButton from "../Button/MyButtonPrimary.vue";
 import inputLabelAndError from "../Input/InputLabelAndError.vue";
 import myDropdown from "../dropdown/MyDropdown.vue";
-import warningDialogVue from "../dialog/WarningDialog.vue";
 import _ from "lodash";
 import { mapActions, mapGetters, mapMutations, mapState } from "vuex";
 import {
@@ -351,13 +339,12 @@ import {
   REGEX_NUMBER,
 } from "@/config/Common";
 import { KEY_CODES, GENDER } from "../../Enums/Enums";
-import { TEXT,FIELD_NAME,TOOLTIP } from "../../resource/ResourceVN"
+import { TEXT, FIELD_NAME, TOOLTIP } from "../../resource/ResourceVN";
 export default {
   components: {
     myButton,
     inputLabelAndError,
     myDropdown,
-    warningDialogVue,
   },
 
   data: function () {
@@ -375,49 +362,45 @@ export default {
         PhoneNumber: null,
         BankNumber: null,
       },
-      dialogData: {
-        dialogShow: false,
-        type: "",
-        description: "",
-        btnText: "Có",
-        btnTextSecondary: "Hủy",
-        btnSecondaryChoseNo: "Không",
-        handleChoseYes: "",
-      },
       GENDER: {},
       Text: TEXT,
       FieldName: FIELD_NAME,
-      Tooltip: TOOLTIP
+      Tooltip: TOOLTIP,
     };
   },
 
   methods: {
-
+    /**
+     * Thay đổi giới tỉnh bằng phím mũi tên
+     * @param {*} e 
+     */
     changeGenderByKeyDown(e) {
-      
       if (e.keyCode == KEY_CODES.ARROW_LEFT) {
-        console.log(this.$store.state.Employee?.Gender)
+        console.log(this.$store.state.Employee?.Gender);
         this.$store.commit(SET_ONE_EMPLOYEE, {
           ...this.$store.state.Employee,
           Gender: +this.$store.state.Employee?.Gender - 1,
           GenderName: "Nam",
-      });
+        });
       }
       if (e.keyCode == KEY_CODES.ARROW_RIGHT) {
-        console.log(this.$store.state.Employee?.Gender)
+        console.log(this.$store.state.Employee?.Gender);
         this.$store.commit(SET_ONE_EMPLOYEE, {
           ...this.$store.state.Employee,
           Gender: +this.$store.state.Employee?.Gender + 1,
           GenderName: "Nam",
-      });
+        });
       }
     },
 
-    chosseGenderByKeydown(value,name) {
+    /**
+     * Thay đổi giới tính bằng phím
+     */
+    chosseGenderByKeydown(value, name) {
       this.$store.commit(SET_ONE_EMPLOYEE, {
-          ...this.$store.state.Employee,
-          Gender: Number(value),
-          GenderName: name,
+        ...this.$store.state.Employee,
+        Gender: Number(value),
+        GenderName: name,
       });
     },
 
@@ -481,7 +464,10 @@ export default {
           });
         }
         if (
-          !this.checkPropertyExist(this.$store.state.Employee, NAME_PROPERTIES.EMPLOYEECODE)
+          !this.checkPropertyExist(
+            this.$store.state.Employee,
+            NAME_PROPERTIES.EMPLOYEECODE
+          )
         ) {
           this.$store.commit(SET_ONE_EMPLOYEE, {
             ...this.$store.state.Employee,
@@ -523,6 +509,10 @@ export default {
       }
     },
 
+    /**
+     * Định dạng ngày tháng
+     * @param {date} value 
+     */
     validateDayOfBirth(value) {
       try {
         let result = new Date(value) - new Date();
@@ -597,9 +587,13 @@ export default {
       }
       if (
         !this.$store.state.Employee?.EmployeeName &&
-        this.checkPropertyExist(this.$store.state.Employee, NAME_PROPERTIES.EMPLOYEENAME)
+        this.checkPropertyExist(
+          this.$store.state.Employee,
+          NAME_PROPERTIES.EMPLOYEENAME
+        )
       ) {
-        this.error.EmployeeName = MESSAGE_VALIDATE.MESSAGE_REQUIRED_EMPLOYEE_NAME;
+        this.error.EmployeeName =
+          MESSAGE_VALIDATE.MESSAGE_REQUIRED_EMPLOYEE_NAME;
         result = false;
       } else {
         this.error.EmployeeName = null;
@@ -607,7 +601,10 @@ export default {
       if (
         this.$store.state.Employee?.Email &&
         !this.validateEmail(this.$store.state.Employee?.Email) &&
-        this.checkPropertyExist(this.$store.state.Employee, NAME_PROPERTIES.EMAIL)
+        this.checkPropertyExist(
+          this.$store.state.Employee,
+          NAME_PROPERTIES.EMAIL
+        )
       ) {
         this.error.Email = MESSAGE_VALIDATE.MESSAGE_VALIDATE_EMAIL;
         result = false;
@@ -662,15 +659,19 @@ export default {
         this.$store.state.Employee?.BankNumber &&
         !this.checkValueWithRegexNumber(this.$store.state.Employee?.BankNumber)
       ) {
-        this.error.BankNumber =
-          MESSAGE_VALIDATE.MESSAGE_ONLYNUMBER(NAME_DISPLAY.BANKNUMBER);
+        this.error.BankNumber = MESSAGE_VALIDATE.MESSAGE_ONLYNUMBER(
+          NAME_DISPLAY.BANKNUMBER
+        );
         result = false;
       } else {
         this.error.BankNumber = null;
       }
       if (
         !this.$store.state.Employee?.DepartmentID &&
-        this.checkPropertyExist(this.$store.state.Employee, NAME_PROPERTIES.DEPARTMENTID)
+        this.checkPropertyExist(
+          this.$store.state.Employee,
+          NAME_PROPERTIES.DEPARTMENTID
+        )
       ) {
         this.error.DepartmentID = MESSAGE_VALIDATE.MESSAGE_REQUIRED_DEPARTMENT;
         result = false;
@@ -765,8 +766,10 @@ export default {
       // this.Employee.EmployeeName
       if (!this.$store.state.editForm) {
         if (!this.validateForm()) return;
-        await this.$store.dispatch("addEmployee", { data: this.$store.state.Employee , closePopup: true});
-        
+        await this.$store.dispatch("addEmployee", {
+          data: this.$store.state.Employee,
+          closePopup: true,
+        });
       } else {
         if (!this.validateForm()) return;
         if (
@@ -796,7 +799,10 @@ export default {
     validateBeforeSave() {
       let result = true;
       if (
-        !this.checkPropertyExist(this.$store.state.Employee, NAME_PROPERTIES.EMPLOYEENAME)
+        !this.checkPropertyExist(
+          this.$store.state.Employee,
+          NAME_PROPERTIES.EMPLOYEENAME
+        )
       ) {
         this.error.EmployeeName = "Tên nhân viên không được để trống";
         this.$store.commit(SET_ONE_EMPLOYEE, {
@@ -808,7 +814,10 @@ export default {
         this.error.EmployeeName = null;
       }
       if (
-        !this.checkPropertyExist(this.$store.state.Employee, NAME_PROPERTIES.DEPARTMENTID)
+        !this.checkPropertyExist(
+          this.$store.state.Employee,
+          NAME_PROPERTIES.DEPARTMENTID
+        )
       ) {
         this.error.DepartmentID = MESSAGE_VALIDATE.MESSAGE_REQUIRED_DEPARTMENT;
         this.$store.commit(SET_ONE_EMPLOYEE, {
@@ -826,7 +835,7 @@ export default {
      * Xử lý khi ấn nút Có trong popup báo dữ liệu thay đổi
      * Author : DTANH (25/10/2022)
      */
-     handleChoseYes() {
+    handleChoseYes() {
       if (this.editForm) {
         this.$store.dispatch("editEmployee", {
           id: this.$store.state.Employee.EmployeeId,
@@ -834,11 +843,12 @@ export default {
         });
         this.$store.commit(SET_MODIFIED_FORM, true);
       } else {
-       this.$store.dispatch("addEmployee", this.$store.state.Employee);
+        this.$store.dispatch("addEmployee", this.$store.state.Employee);
         this.$store.commit(STATUS_POPUP);
         this.$store.commit(SET_MODIFIED_FORM, true);
       }
     },
+
     /**
      * Đóng popup
      * this.dataShow
@@ -846,12 +856,15 @@ export default {
     handleClosePopup() {
       this.dialogData.dialogShow = false;
     },
+    
     /**
      * Thêm nhân viên
      * author : DTANH(31/10/2022)
      */
     async handleAddData() {
-      await this.$store.dispatch("addEmployee", { data : this.$store.state.Employee});
+      await this.$store.dispatch("addEmployee", {
+        data: this.$store.state.Employee,
+      });
     },
 
     /**
@@ -864,8 +877,9 @@ export default {
     checkPropertyExist(obj, property) {
       return hasOwnProperty.call(obj, property);
     },
-
+   
     ...mapActions(["getAllDepartment", "editEmployee", "addEmployee"]),
+    
   },
 
   computed: {
@@ -880,28 +894,29 @@ export default {
       "editForm",
       "cloneEmployee",
       "newEmployeeCode",
+      "dialogData"
     ]),
     ...mapMutations([STATUS_POPUP]),
     ...mapGetters(["getDepartmentNameById", "getNewEmployeeCode"]),
   },
 
-  watch: {
-    /**
-     * Hiển dialog khi có lỗi
-     */
-    resError: function () {
-      console.log("111")
-      if (!_.isEmpty(this.resError)) {
-        this.dialogData.dialogShow = true;
-        this.dialogData.type = "warning";
-        this.dialogData.description = this.resError.errorMsg;
-        this.dialogData.btnText = "Đồng ý";
-        this.dialogData.btnTextSecondary = null;
-        this.dialogData.btnSecondaryChoseNo = null;
-        this.dialogData.handleChoseYes = this.handleClosePopup;
-      }
-    },
-  },
+  // watch: {
+  //   /**
+  //    * Hiển dialog khi có lỗi
+  //    */
+  //   resError: function () {
+  //     console.log("111");
+  //     if (!_.isEmpty(this.resError)) {
+  //       this.dialogData.dialogShow = true;
+  //       this.dialogData.type = "warning";
+  //       this.dialogData.description = this.resError.errorMsg;
+  //       this.dialogData.btnText = "Đồng ý";
+  //       this.dialogData.btnTextSecondary = null;
+  //       this.dialogData.btnSecondaryChoseNo = null;
+  //       this.dialogData.handleChoseYes = this.handleClosePopup;
+  //     }
+  //   },
+  // },
 
   created() {
     this.GENDER = GENDER;

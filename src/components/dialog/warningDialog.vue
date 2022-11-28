@@ -1,5 +1,5 @@
 <template lang="">
-  <div class="dialog" :style="[zIndex ? 'z-index: 999' : '']">
+  <div class="dialog" :style="[zIndex ? 'z-index: 9999999' : '']">
     <div class="dialog__overlay"></div>
     <div class="dialog__container flex-col">
       <div class="dialog__body--title">{{titleDialog}}</div>
@@ -29,7 +29,7 @@
           <myButton
             :btnText="btnTextPrimary"
             isPrimary
-            @click="handleDeleteTrue(event, id)"
+            @click="handleDeleteTrue"
             :color="color"
           ></myButton>
         </div>
@@ -38,6 +38,7 @@
   </div>
 </template>
 <script>
+import { mapState } from 'vuex';
 import myButton from "../Button/MyButtonPrimary.vue";
 export default {
   props: {
@@ -84,6 +85,9 @@ export default {
   },
   components: {
     myButton,
+  },
+  computed: {
+    ...mapState(["dialogData"])
   },
   methods: {},
 };
