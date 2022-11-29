@@ -15,6 +15,7 @@
         :tabindex="tabIndex"
         ref="inputref"
         @keydown.enter.prevent="pressShowDropdown"
+        v-click-away = "onClickAway"
       />
       <div
         class="dropdown__icon"
@@ -45,7 +46,6 @@
         @returnValue="returnValue"
       >
       </Item>
-      {{this.indexSelected}}
     </div>
   </div>
 </template>
@@ -166,7 +166,7 @@ export default {
 
     pressShowDropdown() {
       this.isOpen = !this.isOpen;
-      this.$refs.listDropdown.children[this.indexSelected].focus();
+      // this.$refs.listDropdown.children[this.indexSelected].focus();
       // if(this.id === "dropdown__department"){
       //   this.isOpen = !this.isOpen;
       // }
@@ -174,6 +174,9 @@ export default {
 
     onClickAway() {
       this.isOpen = false;
+    },
+    focus() {
+      this.$refs.inputref.focus();
     },
   },
 

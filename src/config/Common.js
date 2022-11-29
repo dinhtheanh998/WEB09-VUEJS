@@ -13,7 +13,7 @@ export const DEFAULT_GENDER = {
 }
 
 export const MESSAGE_VALIDATE = {
-    MESSAGE_VALIDATE_EMAIL : "Email không hợp lệ",
+    MESSAGE_VALIDATE_EMAIL: "Email không hợp lệ",
     MESSAGE_REQUIRED_EMPLOYEE_NAME : "Vui lòng nhập tên nhân viên",
     MESSAGE_REQUIRED_EMPLOYEE_CODE : "Vui lòng nhập mã nhân viên",
     MESSAGE_VALIDATE_PHONE_NUMBER: "Số điện thoại chỉ được là số",
@@ -75,6 +75,22 @@ export const COLOR = {
     PRIMARY: "#007bff",
     DELETE: "#E81E1E",
 }
+
+export const DESCRIPTION = {
+    DELETE: (code) => [
+        {
+            name: "delete",
+            value: code,
+        },
+    ],
+}
+
+export const OPTION_PAGE_SIZE = [
+    { value: "10", text: "10 bản ghi trên 1 trang" },
+        { value: "20", text: "20 bản ghi trên 1 trang" },
+        { value: "30", text: "30 bản ghi trên 1 trang" },
+        { value: "50", text: "50 bản ghi trên 1 trang" },
+]
 
 
 //https://amis.manhnv.net/api/v1/Employees/filter?pageSize=10&pageNumber=2&employeeFilter=a

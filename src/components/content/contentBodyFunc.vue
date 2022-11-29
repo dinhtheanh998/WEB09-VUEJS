@@ -32,7 +32,7 @@
           <input
             type="text"
             class="input__search"
-            placeholder="Tìm theo mã, tên nhân viên"
+            :placeholder="placeHolder.searchCodeAndName"
             @input="searchDebounce"
           />
           <div class="search__icon"></div>
@@ -44,7 +44,7 @@
       </div>
       <div
         class="reload__icon"
-        title="Làm mới dữ liệu"
+        :title="Text.refeshData"
         @click="reloadData"
       ></div>
     </div>
@@ -56,8 +56,8 @@ import _ from "lodash";
 // import inputIcon from "../Input/inputWithIcon.vue";
 import { mapActions, mapState } from "vuex";
 import { SEARCH_KEYWORD, SET_CHECK_ALL, SET_LIST_DELETE_EMP } from "@/store/Mutatios.Type";
-import  {TEXT,TOOLTIP} from "../../resource/ResourceVN"
-import { COLOR } from "@/config/Common";
+import  {TEXT,TOOLTIP , PLACEHOLDER} from "../../resource/ResourceVN"
+import { COLOR , DESCRIPTION} from "@/config/Common";
 export default {
   data() {
     return {
@@ -68,7 +68,9 @@ export default {
       },
       Text: TEXT,
       Tooltip: TOOLTIP,
-      color: COLOR
+      color: COLOR,
+      description: DESCRIPTION,
+      placeHolder: PLACEHOLDER
     };
   },
   components: {
@@ -98,12 +100,13 @@ export default {
      */
     onClickDeleteMulti() { 
       this.$store.commit("setDialog", {
+        titleDialog: `Xóa ${this.listDeleteIdEmployee.length} nhân viên`,
         dialogShow: true,
-        description: "Bạn có thực sự muốn xóa những nhân viên đã chọn không?",
-        btnText: "Có, xóa nhân viên",
+        description: this.description.DELETE(this.Text.deleteBatchConfirm),
+        btnText: this.Text.delete,
         btnTextSecondary: null,
         handleChoseYes: this.handleDeleteTrue,
-        btnSecondaryChoseNo : "Không",
+        btnSecondaryChoseNo : this.Text.cancelSecond,
         color: this.color.DELETE,
       });
         this.showDialogDel.data= this.listDeleteIdEmployee      

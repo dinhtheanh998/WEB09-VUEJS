@@ -42,7 +42,7 @@ export default {
     handleShowPopup() {      
       this.$store.commit(CLEAR_EMPLOYEE);
       this.$store.commit(SET_ONE_EMPLOYEE, { ...DEFAULT_GENDER, EmployeeCode: this.newEmployeeCode });
-      this.$store.commit(SET_TITLE_POPUP, "Thêm mới nhân viên");
+      this.$store.commit(SET_TITLE_POPUP, TEXT.titleAddEmp);
       this.$store.commit(STATUS_POPUP);
     },
 

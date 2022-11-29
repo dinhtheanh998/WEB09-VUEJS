@@ -1,8 +1,5 @@
 <template lang="">
     <div id="idolLam">
-        Other Component
-        <input type="text" v-model="text">
-        <span>{{text}}</span>
     </div>
 </template>
 <script>

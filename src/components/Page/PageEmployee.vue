@@ -10,11 +10,11 @@
   </div>
 </template>
 <script>
-import contentBodyTop from "../components/content/ContentBodyTop.vue";
-import contentBodyFunc from "../components/content/ContentBodyFunc.vue";
-import contentTableData from "../components/content/ContentTableData.vue";
+import contentBodyTop from "../content/ContentBodyTop.vue";
+import contentBodyFunc from "../content/ContentBodyFunc.vue";
+import contentTableData from "../content/ContentTableData.vue";
+import {TEXT} from '@/resource/ResourceVN';
 export default {
-  name: "layoutContent",
   data: function () {
     return {
       componentKey: 0,
@@ -37,7 +37,7 @@ export default {
     },
   },
   created() {
-    document.title = "Amis - Quản lý nhân sự";
+    document.title = TEXT.titleBrowser;
   },
   
 };

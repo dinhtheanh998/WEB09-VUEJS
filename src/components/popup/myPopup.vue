@@ -33,7 +33,7 @@
             <inputLabelAndError
               :label="FieldName.employeeCode"
               name="EmployeeCode"
-              placeholderText="MNV01"
+              :placeholderText="placeHolder.employeeCode"
               tabIndex="1"
               classProps="flex-col w-40 wrap__textfield"
               @returnValue="returnValue"
@@ -47,11 +47,12 @@
               :label="FieldName.employeeName"
               name="EmployeeName"
               tabIndex="2"
-              placeholderText="Nguyễn Văn A"
+              :placeholderText="placeHolder.employeeName"
               @returnValue="returnValue"
               classProps="flex-col grow-1 wrap__textfield"
               :error="error.EmployeeName"
               :valueInput="Employee.EmployeeName"
+              ref="EmployeeName"
               required
             ></inputLabelAndError>
             <div class="flex-col w-full wrap__textfield">
@@ -64,7 +65,7 @@
                 :defaultValue="Employee.DepartmentName || 'Chọn đơn vị'"
                 :tabIndex="3"
                 :errorMesage="error.DepartmentID"
-                v-click-away="onClickAway"
+                ref="DepartmentID"
               ></myDropdown>
               <span
                 class="input__text-error"
@@ -74,7 +75,7 @@
             <inputLabelAndError
               :label="FieldName.position"
               name="JobPositionName"
-              placeholderText="Trưởng phòng kinh doanh"
+              :placeholderText="placeHolder.jobPositionName"
               tabIndex="4"
               classProps="flex-col w-full wrap__textfield"
               @returnValue="returnValue"
@@ -176,12 +177,12 @@
               :label="FieldName.identityNumber"
               name="IdentityNumber"
               tabIndex="6"
-              placeholderText="125816832"
+              :placeholderText="placeHolder.identityNumber"
               classProps="flex-col  grow-1 wrap__textfield"
               @returnValue="returnValue"
               :valueInput="Employee.IdentityNumber"
               :error="error.IdentityNumber"
-              title="Số Chứng minh nhân dân"
+              :title="Tooltip.identityNumber"
             ></inputLabelAndError>
             <inputLabelAndError
               :label="FieldName.indentityDate"
@@ -200,7 +201,7 @@
               :label="FieldName.indentityPlace"
               name="IdentityPlace"
               tabIndex="8"
-              placeholderText="Bắc Ninh"
+              :placeholderText="placeHolder.identityPlace"
               classProps="flex-col w-full wrap__textfield"
               :valueInput="Employee.IdentityPlace"
               @returnValue="returnValue"
@@ -212,6 +213,7 @@
           name="Adress"
           tabIndex="9"
           classProps="flex-col w-full wrap__textfield"
+          :placeholderText="placeHolder.address"
           :valueInput="Employee.Adress"
           @returnValue="returnValue"
         ></inputLabelAndError>
@@ -220,31 +222,31 @@
             <inputLabelAndError
               :label="FieldName.telePhoneNumber"
               name="TelephoneNumber"
-              placeholderText="0987654321"
+              :placeholderText="placeHolder.telephoneNumber"
               tabIndex="10"
               classProps="flex-col w-50 wrap__textfield"
               :valueInput="Employee.TelephoneNumber"
               @returnValue="returnValue"
               :error="error.TelephoneNumber"
-              title="Điện thoại di động"
+              :title="Tooltip.telephoneNumber"
             ></inputLabelAndError>
             <inputLabelAndError
               :label="FieldName.phoneNumber"
               name="PhoneNumber"
-              placeholderText="0241234567"
+              :placeholderText="placeHolder.phoneNumber"
               tabIndex="11"
               classProps="flex-col w-50 wrap__textfield"
               :valueInput="Employee.PhoneNumber"
               @returnValue="returnValue"
               :error="error.PhoneNumber"
-              title="Điện thoại cố định"
+              :title="Tooltip.phoneNumber"
             ></inputLabelAndError>
           </div>
           <div class="flex align-center w-full gap-x-8">
             <inputLabelAndError
               :label="FieldName.email"
               name="Email"
-              placeholderText="company@example.com"
+              :placeholderText="placeHolder.email"
               tabIndex="12"
               classProps="flex-col w-50 wrap__textfield"
               @returnValue="returnValue"
@@ -256,31 +258,34 @@
         <div class="flex gap-x-8">
           <div class="flex align-center w-full gap-x-8">
             <inputLabelAndError
-              label="Tài khoản ngân hàng"
+              :label="FieldName.bankNumber"
               name="BankNumber"
               tabIndex="13"
               classProps="flex-col w-50 wrap__textfield"
               :valueInput="Employee.BankNumber"
               @returnValue="returnValue"
               :error="error.BankNumber"
+              :placeholderText="placeHolder.bankNumber"
             ></inputLabelAndError>
             <inputLabelAndError
-              label="Tên ngân hàng"
+            :label="FieldName.bankName"
               name="BankName"
               tabIndex="14"
               classProps="flex-col w-50 wrap__textfield"
               :valueInput="Employee.BankName"
               @returnValue="returnValue"
+              :placeholderText="placeHolder.bankName"
             ></inputLabelAndError>
           </div>
           <div class="flex align-center w-full gap-x-8">
             <inputLabelAndError
-              label="Chi nhánh"
+            :label="FieldName.branchName"
               name="BankBranch"
               tabIndex="15"
               classProps="flex-col w-50 wrap__textfield"
               :valueInput="Employee.BankBranch"
               @returnValue="returnValue"
+              :placeholderText="placeHolder.branchName"
             ></inputLabelAndError>
           </div>
         </div>
@@ -313,7 +318,7 @@
         <div class="btn__question" :title="Tooltip.info"></div>
         <div
           class="btn__close"
-          @click.prevent="handleShowPopup"
+          @click.prevent="closePopup"
           :title="Tooltip.close"
         ></div>
       </div>
@@ -333,13 +338,14 @@ import {
   STATUS_POPUP,
 } from "@/store/Mutatios.Type";
 import {
+  COLOR,
   MESSAGE_VALIDATE,
   NAME_DISPLAY,
   NAME_PROPERTIES,
   REGEX_NUMBER,
 } from "@/config/Common";
 import { KEY_CODES, GENDER } from "../../Enums/Enums";
-import { TEXT, FIELD_NAME, TOOLTIP } from "../../resource/ResourceVN";
+import { TEXT, FIELD_NAME, TOOLTIP, PLACEHOLDER } from "../../resource/ResourceVN";
 export default {
   components: {
     myButton,
@@ -366,21 +372,38 @@ export default {
       Text: TEXT,
       FieldName: FIELD_NAME,
       Tooltip: TOOLTIP,
+      color: COLOR,
+      placeHolder: PLACEHOLDER,
     };
   },
 
   methods: {
+    closePopup() {
+      if (
+        !_.isEqual(this.$store.state.Employee, this.$store.state.cloneEmployee)
+      ) {
+        this.dialogData.dialogShow = true;
+        this.dialogData.type = "info";
+        this.dialogData.description = this.Text.descriptionDialogChangeData;
+        this.dialogData.handleChoseYes = this.handleChoseYes;
+        this.dialogData.btnText = this.Text.confirm;
+        this.dialogData.btnTextSecondary = this.Text.cancel;
+        this.dialogData.btnSecondaryChoseNo = this.Text.deny;
+      } else {
+        this.handleShowPopup();
+      }
+    },
+
     /**
      * Thay đổi giới tỉnh bằng phím mũi tên
-     * @param {*} e 
+     * @param {*} e
      */
     changeGenderByKeyDown(e) {
       if (e.keyCode == KEY_CODES.ARROW_LEFT) {
         console.log(this.$store.state.Employee?.Gender);
         this.$store.commit(SET_ONE_EMPLOYEE, {
           ...this.$store.state.Employee,
-          Gender: +this.$store.state.Employee?.Gender - 1,
-          GenderName: "Nam",
+          Gender: +this.$store.state.Employee?.Gender - 1,          
         });
       }
       if (e.keyCode == KEY_CODES.ARROW_RIGHT) {
@@ -388,7 +411,6 @@ export default {
         this.$store.commit(SET_ONE_EMPLOYEE, {
           ...this.$store.state.Employee,
           Gender: +this.$store.state.Employee?.Gender + 1,
-          GenderName: "Nam",
         });
       }
     },
@@ -412,10 +434,10 @@ export default {
       if (e.keyCode === KEY_CODES.ESC) {
         this.handleShowPopup();
       }
-      if (e.keyCode === KEY_CODES.CTRL_F8) {
+      if (e.ctrlKey && e.keyCode === KEY_CODES.CTRL_F8) {
         this.handleSaveData();
       }
-      if (e.keyCode === KEY_CODES.CTRL_F9) {
+      if (e.ctrlKey && e.keyCode === KEY_CODES.CTRL_F9) {
         this.handleShowPopup();
       }
     },
@@ -511,7 +533,7 @@ export default {
 
     /**
      * Định dạng ngày tháng
-     * @param {date} value 
+     * @param {date} value
      */
     validateDayOfBirth(value) {
       try {
@@ -766,10 +788,20 @@ export default {
       // this.Employee.EmployeeName
       if (!this.$store.state.editForm) {
         if (!this.validateForm()) return;
-        await this.$store.dispatch("addEmployee", {
-          data: this.$store.state.Employee,
-          closePopup: true,
-        });
+        if (
+          !_.isEqual(
+            this.$store.state.Employee,
+            this.$store.state.cloneEmployee
+          )
+        ) {
+          this.dialogData.dialogShow = true;
+          this.dialogData.type = "info";
+          this.dialogData.description = this.Text.descriptionDialogChangeData;
+          this.dialogData.handleChoseYes = this.handleChoseYes;
+          this.dialogData.btnText = this.Text.confirm;
+          this.dialogData.btnTextSecondary = this.Text.cancel;
+          this.dialogData.btnSecondaryChoseNo = this.Text.deny;
+        }
       } else {
         if (!this.validateForm()) return;
         if (
@@ -780,12 +812,11 @@ export default {
         ) {
           this.dialogData.dialogShow = true;
           this.dialogData.type = "info";
-          this.dialogData.description =
-            "Dữ liệu đã bị thay đổi. Bạn có muốn cất không?";
+          this.dialogData.description = this.Text.descriptionDialogChangeData;
           this.dialogData.handleChoseYes = this.handleChoseYes;
-          this.dialogData.btnText = "Có";
-          this.dialogData.btnTextSecondary = "Hủy";
-          this.dialogData.btnSecondaryChoseNo = "Không";
+          this.dialogData.btnText = this.Text.confirm;
+          this.dialogData.btnTextSecondary = this.Text.cancel;
+          this.dialogData.btnSecondaryChoseNo = this.Text.deny;
         } else {
           this.handleShowPopup();
         }
@@ -804,7 +835,7 @@ export default {
           NAME_PROPERTIES.EMPLOYEENAME
         )
       ) {
-        this.error.EmployeeName = "Tên nhân viên không được để trống";
+        this.error.EmployeeName = MESSAGE_VALIDATE.MESSAGE_REQUIRED_EMPLOYEE_NAME;
         this.$store.commit(SET_ONE_EMPLOYEE, {
           ...this.$store.state.Employee,
           EmployeeName: null,
@@ -835,17 +866,30 @@ export default {
      * Xử lý khi ấn nút Có trong popup báo dữ liệu thay đổi
      * Author : DTANH (25/10/2022)
      */
-    handleChoseYes() {
+    async handleChoseYes() {
+      this.validateBeforeSave();
       if (this.editForm) {
         this.$store.dispatch("editEmployee", {
           id: this.$store.state.Employee.EmployeeId,
           data: this.$store.state.Employee,
         });
         this.$store.commit(SET_MODIFIED_FORM, true);
+        this.$store.commit("setDialog", {
+          dialogShow: false,
+          color: this.color.PRIMARY,
+        });
       } else {
-        this.$store.dispatch("addEmployee", this.$store.state.Employee);
-        this.$store.commit(STATUS_POPUP);
+        // this.$store.dispatch("addEmployee", this.$store.state.Employee);
+        await this.$store.dispatch("addEmployee", {
+          data: this.$store.state.Employee,
+          closePopup: this.validateForm(),
+        });
+        // this.$store.commit(STATUS_POPUP);
         this.$store.commit(SET_MODIFIED_FORM, true);
+        this.$store.commit("setDialog", {
+          dialogShow: false,
+          color: this.color.PRIMARY,
+        });
       }
     },
 
@@ -856,7 +900,7 @@ export default {
     handleClosePopup() {
       this.dialogData.dialogShow = false;
     },
-    
+
     /**
      * Thêm nhân viên
      * author : DTANH(31/10/2022)
@@ -877,9 +921,15 @@ export default {
     checkPropertyExist(obj, property) {
       return hasOwnProperty.call(obj, property);
     },
-   
+
     ...mapActions(["getAllDepartment", "editEmployee", "addEmployee"]),
-    
+
+    confirmDialog() {
+      this.$store.commit("setDialog", {
+        dialogShow: false,
+      });
+      this.$refs[this.focusInput].focus();
+    }
   },
 
   computed: {
@@ -894,33 +944,46 @@ export default {
       "editForm",
       "cloneEmployee",
       "newEmployeeCode",
-      "dialogData"
+      "dialogData",
+      "focusInput",
     ]),
     ...mapMutations([STATUS_POPUP]),
     ...mapGetters(["getDepartmentNameById", "getNewEmployeeCode"]),
   },
 
-  // watch: {
-  //   /**
-  //    * Hiển dialog khi có lỗi
-  //    */
-  //   resError: function () {
-  //     console.log("111");
-  //     if (!_.isEmpty(this.resError)) {
-  //       this.dialogData.dialogShow = true;
-  //       this.dialogData.type = "warning";
-  //       this.dialogData.description = this.resError.errorMsg;
-  //       this.dialogData.btnText = "Đồng ý";
-  //       this.dialogData.btnTextSecondary = null;
-  //       this.dialogData.btnSecondaryChoseNo = null;
-  //       this.dialogData.handleChoseYes = this.handleClosePopup;
-  //     }
-  //   },
-  // },
+  watch: {
+    /**
+     * Hiển dialog khi có lỗi
+     */
+    resError: function () {
+      this.$store.commit("setDialog", {
+        titleDialog: `Thông báo`,
+        dialogShow: true,
+        type: "warning",
+        description: this.resError.errorMsg,
+        btnText: "Đồng ý",
+        btnTextSecondary: null,
+        handleChoseYes: this.confirmDialog,
+        btnSecondaryChoseNo : null,
+        color: this.color.PRIMARY,
+      });
+      // console.log("111");
+      // if (!_.isEmpty(this.resError)) {
+      //   this.dialogData.dialogShow = true;
+      //   this.dialogData.type = "warning";
+      //   this.dialogData.description = this.resError.errorMsg;
+      //   this.dialogData.btnText = "Đồng ý";
+      //   this.dialogData.btnTextSecondary = null;
+      //   this.dialogData.btnSecondaryChoseNo = null;
+      //   this.dialogData.handleChoseYes = this.handleClosePopup;
+      // }
+    },
+  },
 
   created() {
     this.GENDER = GENDER;
   },
+  
 };
 </script>
 <style lang="css" scoped>

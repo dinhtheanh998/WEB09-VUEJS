@@ -2,7 +2,7 @@
   <div class="wrap__pagging">
     <div class="total__documents">
       <span
-        >Tổng:
+        >textResource.total:
         <strong class="number__documents">{{ totalRecord }}</strong></span
       >
     </div>
@@ -13,7 +13,7 @@
           id="dropdown__range--pagging"
           :arrays="paggingRange"
           moveToTop
-          :defaultValue="pageSize + ' bản ghi trên trang'"
+          :defaultValue="pageSize +' '+textResource.recordPerPage"
           isValidate         
         ></myDropdown>
       </div>
@@ -26,17 +26,14 @@
 <script>
 import myDropdown from "../dropdown/MyDropdown.vue";
 import  Pagging from "../pagging/Pagging.vue"
-// import axios from "axios";
 import { mapActions, mapState } from 'vuex';
+import { TEXT } from '@/resource/ResourceVN';
+import { OPTION_PAGE_SIZE } from '@/config/Common';
 export default {
   data: function () {
     return {
-      paggingRange: [
-        { value: "10", text: "10 bản ghi trên 1 trang" },
-        { value: "20", text: "20 bản ghi trên 1 trang" },
-        { value: "30", text: "30 bản ghi trên 1 trang" },
-        { value: "50", text: "50 bản ghi trên 1 trang" },
-      ],
+      paggingRange: OPTION_PAGE_SIZE,
+      textResource: TEXT
     };
   },
   props: {

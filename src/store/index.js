@@ -130,9 +130,17 @@ export default createStore({
       handleChoseYes: "",
       color: COLOR.PRIMARY
     },
+
+    //tên ô input cần focus
+    focusInput: "",
   },
 
   mutations: {
+
+    focusInput(state, name) { 
+      state.focusInput = name;
+    },
+
     // Hiển thị thông báo lỗi
     setDialog(state, payload) { 
       state.dialogData = {
@@ -416,6 +424,7 @@ export default createStore({
           errorCode: error.response.data.ErrorCode,
           errorMsg: error.response.data.UserMsg,
         });
+        commit("focusInput", error.response.data.Data[0].name);
       }
     },
 
@@ -454,8 +463,9 @@ export default createStore({
           console.log(error);
           commit(SET_ERROR, {
             errorCode: error.response.data.ErrorCode,
-            errorMsg: error.response.data.UserMsg,
+            errorMsg: error.response.data.Data
           });
+          commit("focusInput", error.response.data.Data[0].name)
         });
     },
 
@@ -504,8 +514,9 @@ export default createStore({
           console.log(error);
           commit(SET_ERROR, {
             errorCode: error.response.data.ErrorCode,
-            errorMsg: error.response.data.UserMsg,
+            errorMsg: error.response.data.Data
           });
+          commit("focusInput", error.response.data.Data[0].name)
         });
     },
 
@@ -551,8 +562,9 @@ export default createStore({
         .catch((error) => {
           commit(SET_ERROR, {
             errorCode: error.response.data.ErrorCode,
-            errorMsg: error.response.data.UserMsg,
+            errorMsg: error.response.data.Data
           });
+          commit("focusInput", error.response.data.Data[0].name)
         });
     },
 
@@ -567,8 +579,9 @@ export default createStore({
       } catch (error) {
         commit(SET_ERROR, {
           errorCode: error.response.data.ErrorCode,
-          errorMsg: error.response.data.UserMsg,
+          errorMsg: error.response.data.Data
         });
+        commit("focusInput", error.response.data.Data[0].name)
       }
     },
 
@@ -591,8 +604,9 @@ export default createStore({
         .catch((error) => {
           commit(SET_ERROR, {
             errorCode: error.response.data.ErrorCode,
-            errorMsg: error.response.data.UserMsg,
+            errorMsg: error.response.data.Data
           });
+          commit("focusInput", error.response.data.Data[0].name)
         });
     },
 
@@ -615,11 +629,11 @@ export default createStore({
           });
         })
         .catch((error) => {
-          console.log(error.response.data.UserMsg);
           commit(SET_ERROR, {
             errorCode: error.response.data.ErrorCode,
-            errorMsg: error.response.data.UserMsg,
+            errorMsg: error.response.data.Data
           });
+          commit("focusInput", error.response.data.Data[0].name)
         });
     },
   },

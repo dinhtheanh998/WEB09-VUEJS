@@ -68,7 +68,7 @@
             v-else-if="!listEmployee || listEmployee.length == 0"
             class="loading"
           >
-            <div class="text-center">Không có dữ liệu</div>
+            <div class="text-center">{{text.nonData}}</div>
           </div>
           <tr
             v-else
@@ -132,7 +132,7 @@
                     }
                   "
                 >
-                  Sửa
+                  {{text.edit}}
                 </button>
                 <div
                   class="context__icon"
@@ -146,20 +146,6 @@
     </div>
     <contentPagging :totalRecord="totalRecord"></contentPagging>
   </div>
-  <warningDialogVue
-    v-if="showDialogDel.isShow"
-    :description="
-      'Bạn có chắc chắn muốn xóa nhân viên \<' +
-      infoAndCoord.item.EmployeeCode +
-      '\> không?'
-    "
-    :btnTextPrimary="showDialogDel.btnTextPrimary"
-    :handleDeleteTrue="handleDeleteTrue"
-    :handleDeleteFalse="handleDeleteFalse"
-    :color="color.DELETE"
-    titleDialog="Xóa nhân viên?"
-    btnTextSecondary="Không"
-  ></warningDialogVue>
   <teleport to="body">
     <ContextMenu
       v-if="showContextMenu"
@@ -169,7 +155,7 @@
       id="context__menu"
     ></ContextMenu>
   </teleport>
-  <teleport to="body">
+  <!-- <teleport to="body">
     <FilterConditionVue
       :typeFilter="1"
       v-if="filterInfo.status"
@@ -177,19 +163,18 @@
       :name="filterInfo.name"
       :title="filterInfo.title"
     ></FilterConditionVue>
-  </teleport>
+  </teleport> -->
 </template>
 <script>
 import contentPagging from "./ContentPagging.vue";
-import FilterConditionVue from "../dialog/FilterCondition.vue";
 import {
   DEFAULT_PAGE_SIZE,
   DEFAULT_PAGE_NUMBER,
   COLOR,
+  DESCRIPTION,
 } from "../../config/Common";
 // eslint-disable-next-line no-unused-vars
 import RowDataTable from "./TableRowData.vue";
-import warningDialogVue from "../dialog/WarningDialog.vue";
 import ContextMenu from "../dialog/ContextMenu.vue";
 // import axios from "axios";
 import { mapActions, mapState } from "vuex";
@@ -202,7 +187,7 @@ import {
   STATUS_POPUP,
 } from "@/store/Mutatios.Type";
 import { GENDER } from "../../Enums/Enums";
-import { FIELD_NAME, TOOLTIP } from "../../resource/ResourceVN";
+import { FIELD_NAME, TOOLTIP , NAME_DISPLAY , TEXT  } from "../../resource/ResourceVN";
 export default {
   data: function () {
     return {
@@ -240,14 +225,18 @@ export default {
 
       Tooltip: TOOLTIP,
 
+      text: TEXT,
+
       color: COLOR,
+
+      description: DESCRIPTION,
+
+      nameDisplay: NAME_DISPLAY,
     };
   },
   components: {
     contentPagging,
-    warningDialogVue,
     ContextMenu,
-    FilterConditionVue,
   },
   props: {
     forceRender: {
@@ -289,13 +278,13 @@ export default {
         let gen = "";
         switch (gender) {
           case GENDER.MALE:
-            gen = "Nam";
+            gen = this.text.male;
             break;
           case GENDER.FEMALE:
-            gen = "Nữ";
+            gen = this.text.feMale;
             break;
           case GENDER.OTHER:
-            gen = "Khác";
+            gen = this.text.other;
             break;
         }
         return gen;
@@ -361,9 +350,19 @@ export default {
      * Author: DTANH (25/10/2022)
      */
     handleEmitDelete(id) {
+      this.$store.commit("setDialog", {
+        titleDialog: TEXT.titleDeleteEmp,
+        dialogShow: true,
+        description: this.description.DELETE(`Bạn có chắc chắn muốn xóa nhân viên < ${this.infoAndCoord.item.EmployeeCode} > không?`),
+        btnText: this.text.delete,
+        btnTextSecondary: null,
+        handleChoseYes: this.handleDeleteTrue,
+        btnSecondaryChoseNo : this.text.cancelSecond,
+        color: this.color.DELETE,
+      })
       this.showDialogDel.isShow = true;
       this.showDialogDel.id = id;
-      this.showDialogDel.btnTextPrimary = "Có, xóa nhân viên";
+      this.showDialogDel.btnTextPrimary = this.text.confirmDeleteEmployee;
     },
 
     /**
@@ -374,6 +373,10 @@ export default {
       this.deleteOneRecord(this.showDialogDel.id); // console.log("Xóa bản ghi có id là:", );
       this.showDialogDel.isShow = false;
       this.showDialogDel.id = null;
+      this.$store.commit("setDialog", {
+        dialogShow: false,
+        color: this.color.PRIMARY,
+      });
     },
 
     /**
@@ -430,7 +433,7 @@ export default {
     showPopup() {
       this.$store.commit(SET_EDITFORM, true);
       this.$store.commit(SET_MODIFIED_FORM, true);
-      this.$store.commit(SET_TITLE_POPUP, "Sửa nhân viên");
+      this.$store.commit(SET_TITLE_POPUP, TEXT.titleEditEmp);
       this.$store.commit(STATUS_POPUP);
     },
     ...mapActions([

@@ -2,12 +2,18 @@
   <div class="dialog" :style="[zIndex ? 'z-index: 9999999' : '']">
     <div class="dialog__overlay"></div>
     <div class="dialog__container flex-col">
-      <div class="dialog__body--title">{{titleDialog}}</div>
+      <div class="dialog__body--title">{{dialogData.titleDialog}}</div>
       <div class="dialog__body flex align-center gap-x-16 grow-1">
-        <div class="dialog__body-type" :class="type" v-show="type"></div>
-        <div class="dialog__body-description">
-          {{ description }}
+        <div class="dialog__body-type" :class="dialogData.type" v-show="dialogData.type"></div>
+        <div>
+          <div v-for="(item,index) in description" :key="index">
+            <div class="dialog__body-description">
+              <!-- {{ description }} -->
+              {{description.length > 1 ? index + 1 +'.' : ""}} {{item.value}}
+            </div>
+          </div>
         </div>
+        
       </div>
       <div
         class="dialog__footer flex gap-x-8"
@@ -81,7 +87,11 @@ export default {
     titleDialog: {
       type: String,
       default: "Thông báo",
-    }
+    },
+    arraysLog: {
+      type: Array,
+      default: () => [],
+    },
   },
   components: {
     myButton,

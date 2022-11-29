@@ -14,7 +14,7 @@
   <PaggingVue :totalPage="6" :numberPageDisplay="2"></PaggingVue>  
   <button @click="showToast">Show toast</button> -->
   <!-- <ToastTiFiVue></ToastTiFiVue> -->
-  <FilterConditionVue :typeFilter="4" ></FilterConditionVue>
+  <!-- <FilterConditionVue :typeFilter="4" ></FilterConditionVue> -->
   <ToastTiFiMISA></ToastTiFiMISA>
   <warningDialogVue
         v-if="dialogData.dialogShow"
@@ -114,22 +114,22 @@ export default {
   computed: {
         ...mapState(["pageNumber","totalPage","toastState","resError","dialogData"])
   },
-  watch: {
-    /**
-     * Hiển dialog khi có lỗi
-     */
-    resError: function () {
-      if (!_.isEmpty(this.resError)) {
-        this.dialogData.dialogShow = true;
-        this.dialogData.type = "warning";
-        this.dialogData.description = this.resError.errorMsg;
-        this.dialogData.btnText = "Đồng ý";
-        this.dialogData.btnTextSecondary = null;
-        this.dialogData.btnSecondaryChoseNo = null;
-        this.dialogData.handleChoseYes = this.closeDialog;
-      }
-    },
-  }
+  // watch: {
+  //   /**
+  //    * Hiển dialog khi có lỗi
+  //    */
+  //   resError: function () {
+  //     if (!_.isEmpty(this.resError)) {
+  //       this.dialogData.dialogShow = true;
+  //       this.dialogData.type = "warning";
+  //       this.dialogData.description = this.resError.errorMsg;
+  //       this.dialogData.btnText = "Đồng ý";
+  //       this.dialogData.btnTextSecondary = null;
+  //       this.dialogData.btnSecondaryChoseNo = null;
+  //       this.dialogData.handleChoseYes = this.closeDialog;
+  //     }
+  //   },
+  // }
 }
 </script>
 <style lang="css" scoped>

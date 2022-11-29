@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router";
-import layoutContent from "../layout/LayoutContent.vue";
+import layoutContent from "../components/page/PageEmployee.vue";
 import  OtherCom from "../components/page/OtherComponent.vue"
 
 const routes = [

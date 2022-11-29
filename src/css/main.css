@@ -16,6 +16,11 @@ body {
 	
   }
 
+input[type="date"] {
+	font-family: 'Noto Sans', sans-serif;
+	font-size: 14px;
+}
+
   .flex-col{
 	display: flex;
 	flex-direction: column;
